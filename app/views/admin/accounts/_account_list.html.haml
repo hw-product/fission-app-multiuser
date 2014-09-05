@@ -1,0 +1,26 @@
+%div.panel.panel-default
+  - if defined?(title)
+    %div.panel-heading= title
+  %div.panel-body
+    - if content_for?(pagination)
+      %div.fission-pagination.well.well-sm= content_for(pagination)
+    %table.table.table-hover
+      %thead
+        %tr
+          %th.col-md-3
+            Name
+          %th.col-md-8
+            Source
+          %th.col-md-1
+      %tbody
+        - accounts.each do |account|
+          %tr
+            %td= account.name
+            %td= account.source.name
+            %td
+              %a{:href => admin_account_path(account)}
+                %span.glyphicon.glyphicon-zoom-in
+              %a{:href => edit_admin_account_path(account)}
+                %span.glyphicon.glyphicon-cog
+    - if content_for?(pagination)
+      %div.fission-pagination.well.well-sm= content_for(pagination)

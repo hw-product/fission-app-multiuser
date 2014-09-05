@@ -1,0 +1,14 @@
+:erb
+  <%=
+    create_window(
+      :name => 'user_accounts',
+      :title => 'Accounts',
+      :content => render(
+        :partial => 'accounts/index',
+        :locals => {
+          :accounts => @accounts
+        }
+      ),
+      :size => 'large'
+    )
+  %>

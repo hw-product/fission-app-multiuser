@@ -1,0 +1,3 @@
+= render :partial => 'accounts/account_list', :locals => {:accounts => [@account], :title => 'Main Account', :pagination => nil}
+= render :partial => 'accounts/account_list', :locals => {:accounts => @owned_accounts, :pagination => :owned_accounts_pagination, :title => 'Owned Accounts'}
+= render :partial => 'accounts/account_list', :locals => {:accounts => @member_accounts, :pagination => :member_accounts_pagination, :title => 'Member Accounts'}

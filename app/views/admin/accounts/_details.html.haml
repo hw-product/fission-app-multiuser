@@ -1,0 +1,34 @@
+%div.panel.panel-default
+  %div.panel-heading= account.name
+  %div.panel-body
+    %table.table
+      %tr
+        %td
+          %b
+            Source
+        %td= link_to account.source.name, admin_source_path(account.source)
+      %tr
+        %td
+          %b
+            Permissions
+        %td= link_to account.permissions_dataset.count, admin_account_permissions_path(account)
+      %tr
+        %td
+          %b
+            Tokens
+        %td= link_to account.tokens_dataset.count, admin_account_tokens_path(account)
+      %tr
+        %td
+          %b
+            Owner
+        %td= link_to account.owner.username, admin_account_user_path(account, account.owner)
+      %tr
+        %td
+          %b
+            Managers
+        %td= link_to account.owners_dataset.count, admin_account_users_path(account, :style => 'managers')
+      %tr
+        %td
+          %b
+            Members
+        %td= link_to account.members_dataset.count, admin_account_users_path(account, :style => 'members')

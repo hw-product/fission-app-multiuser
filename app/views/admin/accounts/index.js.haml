@@ -1,0 +1,15 @@
+:erb
+  <%=
+    create_window(
+      :name => 'all_accounts',
+      :title => 'Accounts',
+      :content => render(
+        :partial => 'accounts/account_list'
+        :locals => {
+          :accounts => @accounts,
+          :pagination => :pagination
+        }
+      ),
+      :size => 'large'
+    )
+  %>
