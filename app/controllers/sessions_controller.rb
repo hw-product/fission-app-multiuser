@@ -1,7 +1,8 @@
 class SessionsController < ApplicationController
 
   before_action :validate_user!, :except => [:new, :create, :failure, :authenticate]
-  before_action :validate_permission!, :except => [:destroy], :if => lambda{ user_mode? && valid_user? }
+  before_action :validate_user_permission!, :except => [:destroy], :if => lambda{ user_mode? && valid_user? }
+  before_action :validate_account_permission!, :except => [:destroy], :if => lambda{ user_mode? && valid_user? }
   after_action :save_user_session, :except => [:destroy], :if => lambda{ user_mode? && valid_user? }
 
   def new
