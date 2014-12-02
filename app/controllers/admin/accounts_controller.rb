@@ -1,17 +1,21 @@
 class Admin::AccountsController < ApplicationController
 
   def index
-    if(params[:source_id])
-      @accounts = Source.accounts_dataset.
-        order(:name).paginate(page, per_page)
-    else
-      @accounts = Account.dataset.order(:name).
-        paginate(page, per_page)
-    end
-    enable_pagination_on(@accounts)
     respond_to do |format|
-      format.js
-      format.html
+      format.js do
+        flash[:error] = 'Unsupported request'
+        javascript_redirect_to default_url
+      end
+      format.html do
+        if(params[:source_id])
+          @accounts = Source.accounts_dataset.
+            order(:name).paginate(page, per_page)
+        else
+          @accounts = Account.dataset.order(:name).
+            paginate(page, per_page)
+        end
+        enable_pagination_on(@accounts)
+      end
     end
   end
 
