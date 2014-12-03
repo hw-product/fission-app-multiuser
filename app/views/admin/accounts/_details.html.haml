@@ -1,5 +1,6 @@
 %div.panel.panel-default
-  %div.panel-heading= account.name
+  %div.panel-heading
+    %b= account.name
   %div.panel-body
     %table.table
       %tr
@@ -10,13 +11,28 @@
       %tr
         %td
           %b
-            Permissions
-        %td= link_to account.permissions_dataset.count, admin_account_permissions_path(account)
-      %tr
-        %td
-          %b
             Product Features
-        %td= link_to account.product_features_dataset.count, admin_account_product_features_path(account)
+        %td
+          - Fission::Data::Models::ProductFeature.eager_graph(:product).order(:product__name, :name).all.group_by{|x| x.product.name}.each do |product, features|
+            %ul.list-group
+              %li.list-group-item.disabled
+                %b= product
+              - features.each do |feature|
+                - if account.product_features.include?(feature)
+                  %li.list-group-item.list-group-item-success
+                    = feature.name
+                    .pull-right
+                      %a.text-danger.window-rails{'window-rails-ajax' => :delete, 'window-rails-url' => admin_account_remove_product_feature_path(account, feature), 'window-rails-progress' => "Removing product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Remove product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
+                        %span.glyphicon.glyphicon-remove
+                    .clearfix
+                - else
+                  %li.list-group-item.list-group-item-danger
+                    = feature.name
+                    .pull-right
+                      %a.text-success.window-rails{'window-rails-ajax' => :post, 'window-rails-url' => admin_account_add_product_feature_path(account, feature), 'window-rails-progress' => "Applying product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Apply product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
+                        %span.glyphicon.glyphicon-plus
+                    .clearfix
+
       %tr
         %td
           %b
