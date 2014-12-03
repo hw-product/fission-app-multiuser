@@ -2,10 +2,11 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :accounts do
+      post 'product_feature/:product_feature_id', :to => 'accounts#add_product_feature', :as => :add_product_feature
+      delete 'product_feature/:product_feature_id', :to => 'accounts#remove_product_feature', :as => :remove_product_feature
       resources :users
       resources :permissions
       resources :tokens
-      resources :product_features
     end
     resources :users do
       resources :tokens
