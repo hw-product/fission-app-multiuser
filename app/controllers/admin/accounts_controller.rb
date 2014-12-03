@@ -1,5 +1,13 @@
 class Admin::AccountsController < ApplicationController
 
+  # If we get an account_id param due to route nesting, kill it and
+  # set into `:id` to prevent auto account switching
+  prepend_before_action do
+    if(params[:account_id])
+      params[:id] = params.delete(:account_id)
+    end
+  end
+
   def index
     respond_to do |format|
       format.js do
@@ -34,6 +42,56 @@ class Admin::AccountsController < ApplicationController
         if(flash[:error])
           redirect_to admin_accounts_path
         end
+      end
+    end
+  end
+
+  def add_product_feature
+    respond_to do |format|
+      format.js do
+        feature = ProductFeature.find(params[:product_feature_id])
+        if(feature)
+          account = Account.find_by_id(params[:id])
+          if(account)
+            unless(account.product_features.include?(feature))
+              account.add_product_feature(feature)
+            end
+            javascript_redirect_to admin_account_path(account)
+          else
+            render :text => 'Account not found!', :status => 404
+          end
+        else
+          render :text => 'Product feature not found!', :status => 404
+        end
+      end
+      format.html do
+        flash[:error] = 'Unsupported request!'
+        redirect_to default_url
+      end
+    end
+  end
+
+  def remove_product_feature
+    respond_to do |format|
+      format.js do
+        feature = ProductFeature.find(params[:product_feature_id])
+        if(feature)
+          account = Account.find_by_id(params[:id])
+          if(account)
+            if(account.product_features.include?(feature))
+              account.remove_product_feature(feature)
+            end
+            javascript_redirect_to admin_account_path(account)
+          else
+            render :text => 'Account not found!', :status => 404
+          end
+        else
+          render :text => 'Product feature not found!', :status => 404
+        end
+      end
+      format.html do
+        flash[:error] = 'Unsupported request!'
+        redirect_to default_url
       end
     end
   end
