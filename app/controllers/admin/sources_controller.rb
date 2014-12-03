@@ -29,19 +29,22 @@ class Admin::SourcesController < ApplicationController
     end
   end
 
+  # Disable all resource methods by default
   def new
+    redirection_url = default_url
+    flash[:error] = 'Requested action is disabled'
+    respond_to do |format|
+      format.js do
+        javascript_redirect_to redirection_url
+      end
+      format.html do
+        redirect_to redirection_url
+      end
+    end
   end
-
-  def create
-  end
-
-  def edit
-  end
-
-  def update
-  end
-
-  def destroy
-  end
+  alias_method :create, :new
+  alias_method :edit, :new
+  alias_method :update, :new
+  alias_method :destroy, :new
 
 end
