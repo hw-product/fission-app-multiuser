@@ -1,2 +1,6 @@
-%div.admin.container-fluid.container-padding{:id => "account-#{@account.id}"}
-  = render :partial => 'admin/accounts/details', :locals => {:account => @account}
+:ruby
+  content_for(:container) do
+    render :partial => 'admin/accounts/details', :locals => {:account => @account}
+  end
+
+= render 'layouts/container'
