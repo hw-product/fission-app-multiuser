@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       resources :users
       resources :permissions
       resources :tokens
+      resources :product_features
     end
     resources :users do
       resources :tokens
