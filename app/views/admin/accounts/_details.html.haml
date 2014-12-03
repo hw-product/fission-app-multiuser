@@ -15,6 +15,11 @@
       %tr
         %td
           %b
+            Product Features
+        %td= link_to account.product_features_dataset.count, admin_account_product_features_path(account)
+      %tr
+        %td
+          %b
             Tokens
         %td= link_to account.tokens_dataset.count, admin_account_tokens_path(account)
       %tr
