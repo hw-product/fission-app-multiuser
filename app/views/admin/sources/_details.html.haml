@@ -1,0 +1,14 @@
+%div.panel.panel-default
+  %div.panel-heading= source.name
+  %div.panel-body
+    %table.table
+      %tr
+        %td
+          %b
+            Number accounts
+        %td= source.accounts_dataset.count
+      %tr
+        %td
+          %b
+            Number users
+        %td= source.users_dataset.count

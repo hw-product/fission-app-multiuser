@@ -1,0 +1,6 @@
+:ruby
+  content_for(:container) do
+    render :partial => 'admin/sources/details', :locals => {:source => @source}
+  end
+
+= render 'layouts/container'

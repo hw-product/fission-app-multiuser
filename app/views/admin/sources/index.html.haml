@@ -1,0 +1,13 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'admin/sources/source_list',
+      :locals => {
+        :sources => @sources,
+        :title => 'All sources',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render 'layouts/container'

@@ -1,0 +1,15 @@
+:erb
+  <%=
+    create_window(
+      :name => 'all_sources',
+      :title => 'Sources',
+      :content => render(
+        :partial => 'admin/sources/source_list'
+        :locals => {
+          :sources => @sources,
+          :pagination => :pagination
+        }
+      ),
+      :size => 'large'
+    )
+  %>
