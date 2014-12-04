@@ -49,6 +49,7 @@ class SessionsController < ApplicationController
           Rails.logger.error "Failed to create user!"
           raise Error.new('Failed to create new user', :status => :internal_server_error)
         end
+        grant_admin_to_god!
         redirect_to dashboard_url
       end
     end
@@ -106,6 +107,17 @@ class SessionsController < ApplicationController
       account = source.accounts_dataset.where(:name => org_name).first
       if(account)
         current_user.add_member_account(account)
+      end
+    end
+  end
+
+  def grant_admin_to_god
+    if(god = Rails.application.config.fission.god)
+      if(current_user.username == god[:username] && current_username.source.name == god[:source])
+        account = Account.find_by_name('fission-default-admin')
+        unless(current_user.accounts.include?(account))
+          account.add_owner(current_user)
+        end
       end
     end
   end
