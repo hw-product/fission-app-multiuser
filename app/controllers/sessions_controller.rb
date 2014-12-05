@@ -36,6 +36,7 @@ class SessionsController < ApplicationController
         when :github
           ident = Identity.find_or_create_via_omniauth(auth_hash)
           @current_user = user = ident.user
+          session[:random] = current_user.run_state.random_sec
           register_github_orgs
         when :internal
           user = User.create(params.merge(:provider => :internal))
