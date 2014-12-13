@@ -13,5 +13,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'fission-app'
   s.add_dependency 'omniauth', '~> 1.1'
   s.add_dependency 'omniauth-github'
-  s.files = Dir['**/*']
+  s.files = Dir['{lib,app,config}/**/**/*'] + %w(fission-app-multiuser.gemspec README.md CHANGELOG.md)
 end
