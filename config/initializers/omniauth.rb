@@ -9,9 +9,15 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   else
     Rails.application.config.omniauth_provider = :developer
   end
-  github_key = ENV.fetch('FISSION_GITHUB_KEY', Rails.application.config.fission.github[:key])
-  github_secret = ENV.fetch('FISSION_GITHUB_SECRET', Rails.application.config.fission.github[:secret])
-  provider(:github, github_key, github_secret, scope: 'user:email,repo')
+  provider(
+    :github,
+    :setup => lambda {|env|
+      host_key = env['SERVER_NAME']
+      env['omniauth.strategy'].options[:client_id] = Rails.application.config.fission.github[host_key][:key]
+      env['omniauth.strategy'].options[:client_secret] = Rails.application.config.fission.github[host_key][:secret]
+      env['omniauth.strategy'].options[:scope] = 'user:email,repo'
+    }
+  )
 end
 
 OmniAuth.config.on_failure = Proc.new { |env|
