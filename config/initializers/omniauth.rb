@@ -13,6 +13,9 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     :github,
     :setup => lambda {|env|
       host_key = env['SERVER_NAME']
+      unless(Rails.application.config.fission.github[host_key])
+        host_key = 'default'
+      end
       env['omniauth.strategy'].options[:client_id] = Rails.application.config.fission.github[host_key][:key]
       env['omniauth.strategy'].options[:client_secret] = Rails.application.config.fission.github[host_key][:secret]
       env['omniauth.strategy'].options[:scope] = 'user:email,repo'
