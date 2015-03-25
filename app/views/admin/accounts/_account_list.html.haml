@@ -11,16 +11,11 @@
             Name
           %th.col-md-9
             Source
-      %tbody.link-rows
+      %tbody
         - accounts.each do |account|
-          %tr{ 'data-target' => admin_account_path(account) }
+          %tr.linked{ href: admin_account_path(account) }
             %td= account.name
             %td= account.source.name
 
     - if content_for?(pagination)
       %div.fission-pagination.well.well-sm= content_for(pagination)
-
-:javascript
-  $('.link-rows tr').click(function() {
-    window.location.href = $(this).data('target')
-  })
