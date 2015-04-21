@@ -1,21 +1,20 @@
-%div.panel.panel-default
-  - if defined?(title)
-    %div.panel-heading= title
-  %div.panel-body
-    - if content_for?(pagination)
-      %div.fission-pagination.well.well-sm= content_for(pagination)
-    %table.table.table-hover
-      %thead
-        %tr
-          %th.col-md-3
-            Name
-          %th.col-md-9
-            Source
-      %tbody
-        - accounts.each do |account|
-          %tr.linked{ href: admin_account_path(account) }
-            %td= account.name
-            %td= account.source.name
+- content_for(:pagination_) do
+  - if content_for?(pagination)
+    %div.fission-pagination.well.well-sm= content_for(pagination)
 
-    - if content_for?(pagination)
-      %div.fission-pagination.well.well-sm= content_for(pagination)
+- content_for(:panel) do
+  = content_for(:pagination_)
+
+  - header_data = ['Name', 'Source']
+  - header_classes = ['col-md-3', 'col-md-9']
+  - content_for(:table_body) do
+    - accounts.each do |account|
+      %tr.linked{ href: admin_account_path(account) }
+        %td= account.name
+        %td= account.source.name
+  = render(:partial => 'layouts/table', :locals => { :header_data => header_data, :header_classes => header_classes  })
+
+  = content_for(:pagination_)
+
+- heading = defined?(title) ? title : nil
+= render(:partial => 'layouts/panel', :locals => { :heading => heading })

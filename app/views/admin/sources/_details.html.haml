@@ -1,14 +1,12 @@
-%div.panel.panel-default
-  %div.panel-heading= source.name
-  %div.panel-body
-    %table.table
-      %tr
-        %td
-          %b
-            Number accounts
-        %td= source.accounts_dataset.count
-      %tr
-        %td
-          %b
-            Number users
-        %td= source.users_dataset.count
+:ruby
+  header_data = ['', '']
+  data = [['Number of accounts', source.accounts_dataset.count],
+          ['Number of users', source.users_dataset.count]]
+
+  content_for(:panel) do
+    render(:partial => 'layouts/table',
+           :locals => { :header_data => header_data,
+                        :data => data })
+  end
+
+= render(:partial => 'layouts/panel', :locals => { :heading => source.name })

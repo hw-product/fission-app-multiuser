@@ -1,2 +1,9 @@
-%div#fission-accounts.admin.container.container-padding
-  = render :partial => 'account_list', :locals => {:accounts => @accounts, :title => 'All accounts', :pagination => :pagination}
+:ruby
+  content_for(:container) do
+    render :partial => 'account_list',
+           :locals => { :accounts => @accounts,
+                        :title => 'All accounts',
+                        :pagination => :pagination }
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-accounts', :container_class => 'admin' })
