@@ -1,20 +1,25 @@
-%div.container
-  %div.panel.panel-default#login
-    %div.panel-heading
-      %h1= "Login"
-    %div.panel-body
-      / = simple_form_for @session, :url => authenticate_user_url, :for => 'session' do |f|
-      /   = f.input :username, :input_html => {:name => 'username'}
-      /   = f.input :password, :input_html => {:name => 'password'}
-      /   = f.button :submit
-      %a.button.btn.btn-lg.btn-default.auth{ href: '/auth/github' }
-        %i.fa.fa-github-square
-        = "sign in with GitHub"
-    %div.panel-footer
-      %small
-        %i.fa.fa-lock
-        != "A <a href='https://github.com/'>GitHub account</a> is required to use Packager.co"
-      %div.pull-right
-        / %a{href: '/auth/github'}
-        /   %img{height: 50, width: 50, src: 'http://octodex.github.com/images/daftpunktocat-thomas.gif', alt: 'GH Login', class: 'img-thumbnail'}
-      %div.clearfix
+- content_for(:container) do
+  - content_for(:heading) do
+    %h1= 'Login'
+
+  - content_for(:footer) do
+    %small
+      %i.fa.fa-lock
+      != "A <a href='https://github.com/'>GitHub account</a> is required to use Packager.co"
+    %div.pull-right
+      / %a{href: '/auth/github'}
+      /   %img{height: 50, width: 50, src: 'http://octodex.github.com/images/daftpunktocat-thomas.gif', alt: 'GH Login', class: 'img-thumbnail'}
+    %div.clearfix
+
+  - content_for(:panel) do
+    / = simple_form_for @session, :url => authenticate_user_url, :for => 'session' do |f|
+    /   = f.input :username, :input_html => {:name => 'username'}
+    /   = f.input :password, :input_html => {:name => 'password'}
+    /   = f.button :submit
+    %a.button.btn.btn-lg.btn-default.auth{ href: '/auth/github' }
+      %i.fa.fa-github-square
+      = "sign in with GitHub"
+
+  = render(:partial => 'layouts/panel', :locals => { :id => 'login', :heading => content_for(:heading), :footer => content_for(:footer) })
+
+= render(:partial => 'layouts/container')

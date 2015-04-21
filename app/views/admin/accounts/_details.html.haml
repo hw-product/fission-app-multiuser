@@ -1,55 +1,50 @@
-%div.panel.panel-default
-  %div.panel-heading
-    %b= account.name
-  %div.panel-body
-    %table.table
-      %tr
-        %td
-          %b
-            Source
-        %td= link_to account.source.name, admin_source_path(account.source)
-      %tr
-        %td
-          %b
-            Product Features
-        %td
-          - Fission::Data::Models::ProductFeature.eager_graph(:product).order(:product__name, :name).all.group_by{|x| x.product.name}.each do |product, features|
-            %ul.list-group
-              %li.list-group-item.disabled
-                %b= product
-              - features.each do |feature|
-                - if account.product_features.include?(feature)
-                  %li.list-group-item.list-group-item-success
-                    = feature.name
-                    .pull-right
-                      %a.text-danger.window-rails{'window-rails-ajax' => :delete, 'window-rails-url' => admin_account_remove_product_feature_path(account, feature), 'window-rails-progress' => "Removing product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Remove product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
-                        %span.glyphicon.glyphicon-remove
-                    .clearfix
-                - else
-                  %li.list-group-item.list-group-item-danger
-                    = feature.name
-                    .pull-right
-                      %a.text-success.window-rails{'window-rails-ajax' => :post, 'window-rails-url' => admin_account_add_product_feature_path(account, feature), 'window-rails-progress' => "Applying product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Apply product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
-                        %span.glyphicon.glyphicon-plus
-                    .clearfix
+- content_for(:heading) do
+  %b= account.name
 
-      %tr
-        %td
-          %b
-            Tokens
-        %td= link_to account.tokens_dataset.count, admin_account_tokens_path(account)
-      %tr
-        %td
-          %b
-            Owner
-        %td= link_to account.owner.username, admin_account_user_path(account, account.owner)
-      %tr
-        %td
-          %b
-            Managers
-        %td= link_to account.owners_dataset.count, admin_account_users_path(account, :style => 'managers')
-      %tr
-        %td
-          %b
-            Members
-        %td= link_to account.members_dataset.count, admin_account_users_path(account, :style => 'members')
+- content_for(:table_body) do
+  %tr
+    %td
+      %b
+        Source
+    %td= link_to account.source.name, admin_source_path(account.source)
+  %tr
+    %td
+      %b
+        Product Features
+    %td
+      - Fission::Data::Models::ProductFeature.eager_graph(:product).order(:product__name, :name).all.group_by{|x| x.product.name}.each do |product, features|
+        %ul.list-group
+          %li.list-group-item.disabled
+            %b= product
+          - features.each do |feature|
+            - if account.product_features.include?(feature)
+              %li.list-group-item.list-group-item-success
+                = feature.name
+                .pull-right
+                  %a.text-danger.window-rails{'window-rails-ajax' => :delete, 'window-rails-url' => admin_account_remove_product_feature_path(account, feature), 'window-rails-progress' => "Removing product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Remove product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
+                    %span.glyphicon.glyphicon-remove
+                .clearfix
+            - else
+              %li.list-group-item.list-group-item-danger
+                = feature.name
+                .pull-right
+                  %a.text-success.window-rails{'window-rails-ajax' => :post, 'window-rails-url' => admin_account_add_product_feature_path(account, feature), 'window-rails-progress' => "Applying product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Apply product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
+                    %span.glyphicon.glyphicon-plus
+                .clearfix
+
+  :ruby
+    h = { 'Tokens'   => [account.tokens_dataset.count, admin_account_tokens_path(account)],
+          'Owner'    => [account.owner.username, admin_account_user_path(account, account.owner)],
+          'Managers' => [account.owners_dataset.count, admin_account_users_path(account, :style => 'managers')],
+          'Members'  => [account.members_dataset.count, admin_account_users_path(account, :style => 'members')] }
+
+  - h.each do |name, link_arr|
+    %tr
+      %td
+        %b= name
+      %td= link_to(*link_arr)
+
+- content_for(:panel) do
+  = render(:partial => 'layouts/table')
+
+= render(:partial => 'layouts/panel', :locals => { :heading => content_for(:heading) })
