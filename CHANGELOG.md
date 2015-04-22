@@ -1,3 +1,6 @@
+# v0.1.8
+* View refactors
+
 # v0.1.6
 * Add support for default github configuration
 
