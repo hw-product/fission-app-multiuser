@@ -89,8 +89,17 @@ class SessionsController < ApplicationController
     github_accounts = github(:user).user_teams.group_by do |team|
       team.name == 'Owners' ? :owner : :member
     end
-    github_accounts[:owner].map!(&:organization).map!(&:login).uniq!
-    github_accounts[:member].map!(&:organization).map!(&:login).uniq!
+    all_orgs = []
+    github_accounts[:owner].map! do |team|
+      org = team.organization
+      all_orgs.push(org)
+      org.login
+    end.uniq!
+    github_accounts[:member].map! do |team|
+      org = team.organization
+      all_orgs.push(org)
+      org.login
+    end.uniq!
     github_accounts[:member] -= github_accounts[:owner]
     github_accounts[:owner].each do |org_name|
       next if accts.include?(org_name)
@@ -110,14 +119,26 @@ class SessionsController < ApplicationController
         current_user.add_member_account(account)
       end
     end
+    all_orgs.each do |org|
+      act = Account.find_by_name(org.login)
+      if(act)
+        act.metadata = org.to_hash
+        act.save
+      end
+    end
   end
 
   def grant_admin_to_god!
     if(god = Rails.application.config.fission.config[:god])
       if(current_user.username == god[:username] && current_user.source.name == god[:source])
         account = Account.find_by_name('fission-admin')
-        unless(current_user.accounts.include?(account))
-          account.add_owner(current_user)
+        if(account)
+          unless(current_user.accounts.include?(account))
+            Rails.logger.warn "Adding matched god user to admin account! #{god[:username]}<#{god[:source]}>"
+            account.add_owner(current_user)
+          end
+        else
+          Rails.logger.error 'Failed to locate admin account for god addition!'
         end
       end
     end
