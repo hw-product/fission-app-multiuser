@@ -13,6 +13,14 @@ Rails.application.routes.draw do
       resources :accounts
     end
     # resources :permissions
+
+    resources :products do
+      resources :product_features
+    end
+
+    resources :permissions
+    resources :plans
+
   end
 
   # resources :accounts do
