@@ -29,6 +29,7 @@ class Admin::AccountsController < ApplicationController
 
   def show
     @account = Account.find_by_id(params[:id])
+    @products = Product.order(:name).all
     unless(@account)
       flash[:error] = 'Failed to locate requested account'
     end
@@ -46,52 +47,29 @@ class Admin::AccountsController < ApplicationController
     end
   end
 
-  def add_product_feature
+  def update
     respond_to do |format|
       format.js do
-        feature = ProductFeature.find(params[:product_feature_id])
-        if(feature)
-          account = Account.find_by_id(params[:id])
-          if(account)
-            unless(account.product_features.include?(feature))
-              account.add_product_feature(feature)
-            end
-            javascript_redirect_to admin_account_path(account)
-          else
-            render :text => 'Account not found!', :status => 404
-          end
-        else
-          render :text => 'Product feature not found!', :status => 404
-        end
+        flash[:error] = 'Unsupported request'
+        javascript_redirect_to default_url
       end
       format.html do
-        flash[:error] = 'Unsupported request!'
-        redirect_to default_url
-      end
-    end
-  end
-
-  def remove_product_feature
-    respond_to do |format|
-      format.js do
-        feature = ProductFeature.find(params[:product_feature_id])
-        if(feature)
-          account = Account.find_by_id(params[:id])
-          if(account)
-            if(account.product_features.include?(feature))
-              account.remove_product_feature(feature)
+        account = Account.find_by_id(params[:id])
+        if(account)
+          features = ProductFeature.where(:id => params[:product_features]).all
+          features.each do |prod|
+            unless(account.product_features.include?(prod))
+              account.add_product_feature(prod)
             end
-            javascript_redirect_to admin_account_path(account)
-          else
-            render :text => 'Account not found!', :status => 404
           end
+          (account.product_features - features).each do |prod|
+            account.remove_product_feature(prod)
+          end
+          flash[:success] = 'Account updated!'
         else
-          render :text => 'Product feature not found!', :status => 404
+          flash[:error] = 'Failed to locate requested account'
         end
-      end
-      format.html do
-        flash[:error] = 'Unsupported request!'
-        redirect_to default_url
+        redirect_to admin_accounts_path
       end
     end
   end
@@ -111,7 +89,6 @@ class Admin::AccountsController < ApplicationController
   end
   alias_method :create, :new
   alias_method :edit, :new
-  alias_method :update, :new
   alias_method :destroy, :new
 
 end

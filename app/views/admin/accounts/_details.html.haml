@@ -1,50 +1,66 @@
-- content_for(:heading) do
-  %b= account.name
-
-- content_for(:table_body) do
-  %tr
-    %td
-      %b
-        Source
-    %td= link_to account.source.name, admin_source_path(account.source)
-  %tr
-    %td
-      %b
-        Product Features
-    %td
-      - Fission::Data::Models::ProductFeature.eager_graph(:product).order(:product__name, :name).all.group_by{|x| x.product.name}.each do |product, features|
-        %ul.list-group
-          %li.list-group-item.disabled
-            %b= product
-          - features.each do |feature|
-            - if account.product_features.include?(feature)
-              %li.list-group-item.list-group-item-success
-                = feature.name
-                .pull-right
-                  %a.text-danger.window-rails{'window-rails-ajax' => :delete, 'window-rails-url' => admin_account_remove_product_feature_path(account, feature), 'window-rails-progress' => "Removing product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Remove product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
-                    %span.glyphicon.glyphicon-remove
-                .clearfix
-            - else
-              %li.list-group-item.list-group-item-danger
-                = feature.name
-                .pull-right
-                  %a.text-success.window-rails{'window-rails-ajax' => :post, 'window-rails-url' => admin_account_add_product_feature_path(account, feature), 'window-rails-progress' => "Applying product feature: #{feature.product.name}: #{feature.name}", 'window-rails-confirm' => "Apply product feature (#{feature.product.name} - #{feature.name})?", 'window-rails-title' => 'Account Update'}
-                    %span.glyphicon.glyphicon-plus
-                .clearfix
-
-  :ruby
-    h = { 'Tokens'   => [account.tokens_dataset.count, admin_account_tokens_path(account)],
-          'Owner'    => [account.owner.username, admin_account_user_path(account, account.owner)],
-          'Managers' => [account.owners_dataset.count, admin_account_users_path(account, :style => 'managers')],
-          'Members'  => [account.members_dataset.count, admin_account_users_path(account, :style => 'members')] }
-
-  - h.each do |name, link_arr|
-    %tr
-      %td
-        %b= name
-      %td= link_to(*link_arr)
-
 - content_for(:panel) do
-  = render(:partial => 'layouts/table')
+  = bootstrap_form_tag :url => admin_account_path(account.id), :method => :put, :html => {:id => 'feature-form'} do |f|
+    = f.text_field :source, :value => account.source.name, :disabled => true
+    .panel.panel-default
+      .panel-heading
+        Direct enabled product features
+      %table.table.product-features
+        - @products.each do |product|
+          %thead
+            %tr
+              %th= product.name
+          %tbody
+            - product.product_features_dataset.order(:name).each do |feature|
+              %tr
+                %td{:class => account.product_features.include?(feature) ? 'success' : 'text-danger', 'feature-id' => feature.id, 'feature-active' => account.product_features.include?(feature).to_s}= feature.name.humanize
+    = f.text_field :tokens, :value => account.tokens_dataset.count, :disabled => true
+    = f.text_field :owner, :value => account.owner.username, :disabled => true
+    = f.text_field :managers, :value => account.owners_dataset.count, :disabled => true
+    = f.text_field :members, :value => account.members_dataset.count, :disabled => true
+    = f.submit 'Save', :class => 'btn btn-success pull-right', :id => 'feature-form-submit'
 
-= render(:partial => 'layouts/panel', :locals => { :heading => content_for(:heading) })
+:ruby
+  output = render(
+    :partial => 'layouts/container',
+    :locals => {
+      :panel => {
+        :heading => "#{account.name} Account"
+      }
+    }
+  )
+
+= output
+
+:javascript
+  $(document).ready(
+    function(){
+      $('.product-features td').hover(
+        function(){
+          $(this).filter('td[feature-active=true]').removeClass('success').addClass('danger');
+          $(this).filter('td[feature-active=false]').removeClass('text-danger').addClass('active').addClass('text-success');
+          $(this).css('cursor', 'pointer');
+        },
+        function(){
+          $(this).filter('td[feature-active=true]').removeClass('danger').addClass('success');
+          $(this).filter('td[feature-active=false]').removeClass('text-success').removeClass('active').addClass('text-danger');
+          $(this).css('cursor', 'default');
+        }
+      );
+      $('.product-features td').click(
+        function(){
+          if($(this).attr('feature-active') == 'true'){
+            $(this).attr('feature-active', 'false').removeClass('success').removeClass('danger').addClass('text-danger');
+          }
+          else {
+            $(this).attr('feature-active', 'true').addClass('success').removeClass('text-danger').removeClass('text-success');
+          }
+        }
+      );
+      $('#feature-form').submit(function(event){
+        $('#feature-form-submit').val('Saving...').attr('disabled', 'disabled');
+        $('.product-features td[feature-active=true]').each(function(idx, item){
+          $('#feature-form').append('<input type="hidden" name="product_features[]" value="' + $(item).attr('feature-id') + '" />');
+        });
+      });
+    }
+  );
