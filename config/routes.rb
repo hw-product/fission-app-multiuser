@@ -2,26 +2,26 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :accounts do
-      resources :users
-      resources :permissions
-      resources :tokens
+      # resources :users
+      # resources :permissions
+      # resources :tokens
     end
-    resources :users do
-      resources :tokens
-    end
+    # resources :users do
+    #   resources :tokens
+    # end
     resources :sources do
       resources :accounts
     end
-    resources :permissions
+    # resources :permissions
   end
 
-  resources :accounts do
-    resources :tokens
-  end
+  # resources :accounts do
+  #   resources :tokens
+  # end
 
-  resources :users do
-    resources :tokens
-  end
+  # resources :users do
+  #   resources :tokens
+  # end
 
   get 'login', :to => 'sessions#new', :as => :new_session
   get 'logout', :to => 'sessions#destroy', :as => :destroy_session
