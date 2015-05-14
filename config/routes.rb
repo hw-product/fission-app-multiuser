@@ -14,10 +14,7 @@ Rails.application.routes.draw do
     end
     # resources :permissions
 
-    resources :products do
-      resources :product_features
-    end
-
+    resources :products, :except => [:show]
     resources :permissions
     resources :plans
 
