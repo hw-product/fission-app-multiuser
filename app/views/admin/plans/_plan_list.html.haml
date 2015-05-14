@@ -1,0 +1,26 @@
+- content_for(:heading_title) do
+  %b
+    Fission Plan Listing
+  = link_to('Create', new_admin_plan_path, :class => 'btn btn-success btn-sm pull-right')
+  .clearfix
+
+:ruby
+  id = 'plan-list'
+  content = render(
+    :partial => 'layouts/panel',
+    :locals => {
+      :id => id,
+      :heading => yield(:heading_title),
+      :panel_content => render(
+        :partial => 'layouts/table',
+        :locals => {
+          :header_data => ['Plan Name'],
+          :data => plans.map{|plan|
+            [link_to(plan.name, edit_admin_plan_path(plan.id))]
+          }
+        }
+      )
+    }
+  )
+
+= content

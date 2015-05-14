@@ -37,7 +37,8 @@ module FissionApp
             'Accounts' => Rails.application.routes.url_helpers.admin_accounts_path,
             'Sources' => Rails.application.routes.url_helpers.admin_sources_path,
             'Products' => Rails.application.routes.url_helpers.admin_products_path,
-            'Permissions' => Rails.application.routes.url_helpers.admin_permissions_path
+            'Permissions' => Rails.application.routes.url_helpers.admin_permissions_path,
+            'Plans' => Rails.application.routes.url_helpers.admin_plans_path
           )
         )
       end

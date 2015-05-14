@@ -1,0 +1,5 @@
+= bootstrap_form_tag form_opts.merge(:html => {:id => 'plan-form'}) do |f|
+  = f.text_field :name, :value => @plan ? @plan.name : nil, :autofocus => true
+  = f.text_area :summary, :value => @plan ? @plan.summary : nil
+  = f.text_area :description, :value => @plan ? @plan.description : nil
+  = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'

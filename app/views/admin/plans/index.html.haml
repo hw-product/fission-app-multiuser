@@ -1,0 +1,13 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'plan_list',
+      :locals => {
+        :plans => @plans,
+        :title => 'All Plans',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-plans', :container_class => 'admin' })
