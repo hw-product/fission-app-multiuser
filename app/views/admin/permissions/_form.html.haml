@@ -1,0 +1,4 @@
+= bootstrap_form_tag form_opts.merge(:html => {:id => 'permission-form'}) do |f|
+  = f.text_field :name, :value => @permission ? @permission.name : nil, :autofocus => true
+  = f.text_field :pattern, :value => @permission ? @permission.pattern : nil, :autofocus => true
+  = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'

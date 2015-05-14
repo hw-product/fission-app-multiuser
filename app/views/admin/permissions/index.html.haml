@@ -1,0 +1,13 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'permission_list',
+      :locals => {
+        :permissions => @permissions,
+        :title => 'All Permissions',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-permissions', :container_class => 'admin' })

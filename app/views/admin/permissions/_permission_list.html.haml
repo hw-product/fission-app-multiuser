@@ -1,0 +1,26 @@
+- content_for(:heading_title) do
+  %b
+    Fission Permission Listing
+  = link_to('Create', new_admin_permission_path, :class => 'btn btn-success btn-sm pull-right')
+  .clearfix
+
+:ruby
+  id = 'permission-list'
+  content = render(
+    :partial => 'layouts/panel',
+    :locals => {
+      :id => id,
+      :heading => yield(:heading_title),
+      :panel_content => render(
+        :partial => 'layouts/table',
+        :locals => {
+          :header_data => ['Permission', 'Pattern'],
+          :data => permissions.map{|permission|
+            [link_to(permission.name, edit_admin_permission_path(permission.id)), permission.pattern]
+          }
+        }
+      )
+    }
+  )
+
+= content

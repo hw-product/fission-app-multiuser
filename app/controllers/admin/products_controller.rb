@@ -119,7 +119,7 @@ class Admin::ProductsController < ApplicationController
               feature.add_permission(Permission.find_by_id(perm_id))
             end
           end
-          flash[:success] = "New product created! (#{product.name})"
+          flash[:success] = "Product updated! (#{product.name})"
           redirect_to admin_products_path
         else
           flash[:error] = 'Failed to locate requested product!'
