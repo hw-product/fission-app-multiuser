@@ -1,0 +1,135 @@
+= bootstrap_form_tag form_opts.merge(:html => {:id => 'product-form'}) do |f|
+  = f.text_field :name, :value => @product ? @product.name : nil, :autofocus => true
+  - if @product
+    = f.text_field :internal_name, :value => @product.internal_name, :disabled => true
+  = f.text_field :vanity_dns, :value => @product ? @product.vanity_dns : nil
+  = f.select :service_group_id, @service_groups.map{|g| [g.name, g.id]}.unshift(['','']), :selected => @product && @product.service_group ? @product.service_group.id : ''
+  %br
+  %fieldset
+    %legend
+      Product Features
+      %a.btn.btn-success.btn-xs.pull-right#feature-adder{:href => '#'}
+        %span.glyphicon.glyphicon-plus
+      .clearfix
+    %table.table.table-striped#product-features
+      - if @product
+        - @product.product_features.each do |feature|
+          = render :partial => 'product_feature', :locals => {:feature_name => feature.name, :feature_id => feature.id, :permission_ids => feature.permissions.map(&:id)}
+  %br
+  = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
+
+:javascript
+  $(document).ready(
+    function(){
+      $('#product-form').submit(function(event){
+        $(this).find('#product-features .row').each(function(idx, elm){
+          if($(elm).attr('feature-id')){
+            $('#product-form').append('<input type="hidden" name="product_feature_ids[' + $(elm).attr('feature-id') + ']" value="' + $(elm).attr('feature-name') + '"/>');
+            $('#product-form').append('<input type="hidden" name="product_feature_id_perms[' + $(elm).attr('feature-id') + ']" value="' + ($(elm).attr('permission-ids') || '') + '" />');
+          }
+          else{
+            $('#product-form').append('<input type="hidden" name="product_feature_names[' + $(elm).attr('feature-name') + ']" value="' + ($(elm).attr('permission-ids') || '') + '" />');
+          }
+        });
+      });
+      $('a.feature-del').click(function(){
+        dom_id = $(this).parents('.row').first().attr('id');
+        sparkle_ui.display.highlight(dom_id, 'danger');
+        setTimeout(function(){
+          $('#' + dom_id).remove();
+        }, 2000);
+      });
+      // Add new product feature
+      $('#product-form #feature-adder').click(function(){
+        window_rails.create_window({
+          name: 'product_feature_editor',
+          title: 'Product Feature',
+          size: 'large',
+          content: ''
+        });
+        new_id = 'feature-product-form-' + Math.floor(Math.random() * 100000);
+        product_feature_form = $('#feature-product-form-template').clone();
+        product_feature_form.find('#feature-product-form').attr('id', new_id);
+        window_rails.open_window('product_feature_editor', {
+          content: product_feature_form.html(),
+          backdrop: true
+        });
+        $('#' + new_id).submit(function(){
+          form = $('#' + new_id);
+          base = $('#feature-product-line').clone();
+          row = base.find('.row');
+          row.attr('id', Math.floor(Math.random() * 100000));
+          row.attr('feature-name', form.find('input[name=feature_name]').val());
+          row.attr('permission-ids', (form.find('select').val() || []).join(','));
+          row.find('.feature-expander').html(form.find('input[name=feature_name]').val());
+          window_rails.close_window('product_feature_editor');
+          $('#product-features').append(row.parent().html());
+          sparkle_ui.display.highlight(row.attr('id'), 'success');
+          hook_product_features();
+          return false;
+        });
+      });
+      hook_product_features();
+    });
+    function hook_product_features(){
+      // Modify existing product feature
+      $('#product-form .feature-expander').hover(
+        function(){
+          $(this).addClass('bg-info').addClass('text-warning').css('cursor', 'pointer');
+        },
+        function(){
+          $(this).removeClass('bg-info').removeClass('text-warning').css('cursor', 'default');
+        }
+      ).click(function(){
+        window_rails.create_window({
+          name: 'product_feature_editor',
+          title: 'Product Feature',
+          size: 'large',
+          content: ''
+        });
+        new_id = 'feature-product-form-' + Math.floor(Math.random() * 100000);
+        caller_id = $(this).parents('.row').attr('id');
+        product_feature_form = $('#feature-product-form-template').clone();
+        product_feature_form.find('#feature-product-form').attr('id', new_id);
+        window_rails.open_window('product_feature_editor', {
+          content: product_feature_form.html(),
+          backdrop: true
+        });
+        elm = $(this).parents('.row');
+        if(elm.attr('feature-name')){
+          $('#' + new_id + ' input[name=feature_name]').val(elm.attr('feature-name'));
+        }
+        if(elm.attr('permission-ids')){
+          $(elm.attr('permission-ids').split(',')).each(function(idx, perm_id){
+            $('#' + new_id + '  option[value=' + perm_id + ']').attr('selected', 'selected');
+          });
+        }
+        $('#' + new_id).submit(function(){
+          form = $('#' + new_id);
+          row = $('#' + caller_id);
+          row.attr('feature-name', form.find('input[name=feature_name]').val());
+          row.attr('permission-ids', form.find('select').val().join(','));
+          row.find('.feature-expander').html(form.find('input[name=feature_name]').val());
+          window_rails.close_window('product_feature_editor');
+          sparkle_ui.display.highlight(caller_id, 'success');
+          return false;
+        });
+      });
+    }
+
+.hide#feature-product-form-template
+  %form#feature-product-form
+    .form-group
+      %label.control-label{:for => 'feature_name'}
+        Feature Name
+      %input.form-control{:type => 'text', :name => 'feature_name'}
+    .form-group
+      %label.control-label{:for => 'feature_permission_ids'}
+        Feature Permissions
+      %select.form-control{:multiple => true, :name => 'feature_permission_ids[]'}
+        - @permissions.each do |perm|
+          %option{:value => perm.id}= perm.name
+    %input.btn.btn-success.pull-right{:type => 'submit', :value => 'Save'}
+    .clearfix
+%table.hide#feature-product-line
+  = render :partial => 'product_feature', :locals => {:feature_name => 'stubby'}

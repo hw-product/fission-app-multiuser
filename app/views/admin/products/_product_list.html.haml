@@ -1,0 +1,26 @@
+- content_for(:heading_title) do
+  %b
+    Fission Product Listing
+  = link_to('Create', new_admin_product_path, :class => 'btn btn-success btn-sm pull-right')
+  .clearfix
+
+:ruby
+  id = 'product-list'
+  content = render(
+    :partial => 'layouts/panel',
+    :locals => {
+      :id => id,
+      :heading => yield(:heading_title),
+      :panel_content => render(
+        :partial => 'layouts/table',
+        :locals => {
+          :header_data => ['Product'],
+          :data => products.map{|product|
+            [link_to(product.name, edit_admin_product_path(product.id))]
+          }
+        }
+      )
+    }
+  )
+
+= content

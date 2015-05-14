@@ -1,0 +1,13 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'product_list',
+      :locals => {
+        :products => @products,
+        :title => 'All Products',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-products', :container_class => 'admin' })

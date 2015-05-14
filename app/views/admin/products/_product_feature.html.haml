@@ -1,0 +1,17 @@
+:ruby
+  row_attrs = Smash.new.tap do |attrs|
+    attrs['feature-name'] = feature_name
+    if(defined?(feature_id))
+      attrs['feature-id'] = feature_id
+    end
+    if(defined?(permission_ids))
+      attrs['permission-ids'] = permission_ids.join(',')
+    end
+    attrs['id'] = SecureRandom.uuid
+  end
+
+%tr.row{row_attrs}
+  %td.feature-expander= feature_name.humanize
+  %td
+    %a.btn.btn-danger.btn-xs.feature-del.pull-right{:href => '#'}
+      %span.glyphicon.glyphicon-trash
