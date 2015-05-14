@@ -1,8 +1,7 @@
-- content_for(:delete) do
-  %span.glyphicon.glyphicon-trash
 - content_for(:heading_title) do
   = "Edit Product - #{@product.name}"
-  = link_to(yield(:delete), admin_product_path(@product.id), :class => 'btn btn-xs btn-danger pull-right', :method => :delete, :remote => true)
+  %button.window-rails.btn.btn-xs.btn-danger.pull-right{'window-rails-ajax' => :delete, 'window-rails-url' => admin_product_path(@product.id), 'window-rails-confirm' => "Destroy product `#{@product.name}`?", 'window-rails-progress' => 'Destroying product', 'window-rails-title' => 'Product destruction'}
+    %span.glyphicon.glyphicon-trash
   .clearfix
 
 :ruby
