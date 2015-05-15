@@ -13,8 +13,8 @@
       .clearfix
     %table.table.table-striped#product-features
       - if @product
-        - @product.product_features.each do |feature|
-          = render :partial => 'product_feature', :locals => {:feature_name => feature.name, :feature_id => feature.id, :permission_ids => feature.permissions.map(&:id)}
+        - @product.product_features_dataset.order(:name).all.each do |feature|
+          = render :partial => 'product_feature', :locals => {:feature_name => feature.name, :feature_id => feature.id, :feature_price => feature.cost, :permission_ids => feature.permissions.map(&:id)}
   %br
   = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
 
@@ -26,9 +26,11 @@
           if($(elm).attr('feature-id')){
             $('#product-form').append('<input type="hidden" name="product_feature_ids[' + $(elm).attr('feature-id') + ']" value="' + $(elm).attr('feature-name') + '"/>');
             $('#product-form').append('<input type="hidden" name="product_feature_id_perms[' + $(elm).attr('feature-id') + ']" value="' + ($(elm).attr('permission-ids') || '') + '" />');
+            $('#product-form').append('<input type="hidden" name="product_feature_id_price[' + $(elm).attr('feature-id') + ']" value="' + ($(elm).attr('feature-price') || '') + '" />');
           }
           else{
             $('#product-form').append('<input type="hidden" name="product_feature_names[' + $(elm).attr('feature-name') + ']" value="' + ($(elm).attr('permission-ids') || '') + '" />');
+            $('#product-form').append('<input type="hidden" name="product_feature_name_price[' + $(elm).attr('feature-name') + ']" value="' + ($(elm).attr('feature-price') || '') + '" />');
           }
         });
       });
@@ -61,7 +63,9 @@
           row.attr('id', Math.floor(Math.random() * 100000));
           row.attr('feature-name', form.find('input[name=feature_name]').val());
           row.attr('permission-ids', (form.find('select').val() || []).join(','));
-          row.find('.feature-expander').html(form.find('input[name=feature_name]').val());
+          row.attr('feature-price', form.find('input[name=feature_price]').val());
+          row.find('.feature-name').html(form.find('input[name=feature_name]').val());
+          row.find('.feature-price').html('$' + form.find('input[name=feature_price]').val() + '.00');
           window_rails.close_window('product_feature_editor');
           $('#product-features').append(row.parent().html());
           sparkle_ui.display.highlight(row.attr('id'), 'success');
@@ -75,10 +79,10 @@
       // Modify existing product feature
       $('#product-form .feature-expander').hover(
         function(){
-          $(this).addClass('bg-info').addClass('text-warning').css('cursor', 'pointer');
+          $(this).parent().find('.feature-expander').addClass('bg-info').addClass('text-warning').css('cursor', 'pointer');
         },
         function(){
-          $(this).removeClass('bg-info').removeClass('text-warning').css('cursor', 'default');
+          $(this).parent().find('.feature-expander').removeClass('bg-info').removeClass('text-warning').css('cursor', 'default');
         }
       ).click(function(){
         window_rails.create_window({
@@ -99,6 +103,9 @@
         if(elm.attr('feature-name')){
           $('#' + new_id + ' input[name=feature_name]').val(elm.attr('feature-name'));
         }
+        if(elm.attr('feature-price')){
+          $('#' + new_id + ' input[name=feature_price]').val(elm.attr('feature-price'));
+        }
         if(elm.attr('permission-ids')){
           $(elm.attr('permission-ids').split(',')).each(function(idx, perm_id){
             $('#' + new_id + '  option[value=' + perm_id + ']').attr('selected', 'selected');
@@ -108,8 +115,10 @@
           form = $('#' + new_id);
           row = $('#' + caller_id);
           row.attr('feature-name', form.find('input[name=feature_name]').val());
-          row.attr('permission-ids', form.find('select').val().join(','));
-          row.find('.feature-expander').html(form.find('input[name=feature_name]').val());
+          row.attr('permission-ids', (form.find('select').val() || []).join(','));
+          row.attr('feature-price', form.find('input[name=feature_price]').val());
+          row.find('.feature-name').html(form.find('input[name=feature_name]').val());
+          row.find('.feature-price').html('$' + form.find('input[name=feature_price]').val() + '.00');
           window_rails.close_window('product_feature_editor');
           sparkle_ui.display.highlight(caller_id, 'success');
           return false;
@@ -123,6 +132,14 @@
       %label.control-label{:for => 'feature_name'}
         Feature Name
       %input.form-control{:type => 'text', :name => 'feature_name'}
+    .form-group
+      %label.control-label{:for => 'feature_price'}
+        Feature Price
+      .input-group
+        %span.input-group-addon
+          $
+        %input.form-control{:type => 'text', :name => 'feature_price'}
+        %span.input-group-addon= '.00'
     .form-group
       %label.control-label{:for => 'feature_permission_ids'}
         Feature Permissions

@@ -2,6 +2,52 @@
   = f.text_field :name, :value => @plan ? @plan.name : nil, :autofocus => true
   = f.text_field :summary, :value => @plan ? @plan.summary : nil
   = f.text_field :price, :value => @plan ? @plan.cost : nil, :prepend => '$', :append => '.00'
-  = f.select :product_ids, @products.map{|g| [g.name, g.id]}, {:include_blank => true, :selected => @plan ? @plan.products.map(&:id) : []}, :multiple => true
+  = f.select :product_id, @products.map{|g| [g.name, g.id]}, :label => 'Products', :include_blank => true, :selected => @plan ? @plan.product.id : nil
   = f.text_area :description, :value => @plan ? @plan.description : nil
+  .panel.panel-default
+    .panel-heading
+      Enabled product features
+    %table.table.product-features
+      - @products.each do |product|
+        %thead
+          %tr
+            %th= product.name
+        %tbody
+          - product.product_features_dataset.order(:name).each do |feature|
+            %tr
+              %td{:class => @plan && @plan.product_features.include?(feature) ? 'success' : 'text-danger', 'feature-id' => feature.id, 'feature-active' => @plan && @plan.product_features.include?(feature).to_s}= feature.name.humanize
   = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
+  .clearfix
+
+:javascript
+  $(document).ready(
+    function(){
+      $('.product-features td').hover(
+        function(){
+          $(this).filter('td[feature-active=true]').removeClass('success').addClass('danger');
+          $(this).filter('td[feature-active=false]').removeClass('text-danger').addClass('active').addClass('text-success');
+          $(this).css('cursor', 'pointer');
+        },
+        function(){
+          $(this).filter('td[feature-active=true]').removeClass('danger').addClass('success');
+          $(this).filter('td[feature-active=false]').removeClass('text-success').removeClass('active').addClass('text-danger');
+          $(this).css('cursor', 'default');
+        }
+      );
+      $('.product-features td').click(
+        function(){
+          if($(this).attr('feature-active') == 'true'){
+            $(this).attr('feature-active', 'false').removeClass('success').removeClass('danger').addClass('text-danger');
+          }
+          else {
+            $(this).attr('feature-active', 'true').addClass('success').removeClass('text-danger').removeClass('text-success');
+          }
+        }
+      );
+      $('#plan-form').submit(function(event){
+        $('.product-features td[feature-active=true]').each(function(idx, item){
+          $('#plan-form').append('<input type="hidden" name="product_features[]" value="' + $(item).attr('feature-id') + '" />');
+        });
+      });
+    }
+  );

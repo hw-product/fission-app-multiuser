@@ -35,16 +35,10 @@ class Admin::PlansController < ApplicationController
         plan = Plan.create(
           :name => params[:name],
           :summary => params[:summary],
-          :description => params[:description]
+          :description => params[:description],
+          :product_id => params[:product_id].present? ? params[:product_id].to_i : nil
         )
-        plan.price.cost = params[:price].to_i
-        plan.price.save
-        p_ids = params[:product_ids].find_all{|i| !i.blank? }
-        unless(p_ids.empty?)
-          Product.where(:id => p_ids).all.each do |product|
-            plan.add_product(product)
-          end
-        end
+        plan.price = params[:price].to_i
         flash[:success] = "New plan created! (#{plan.name})"
         redirect_to admin_plans_path
       end
@@ -81,17 +75,13 @@ class Admin::PlansController < ApplicationController
           plan.name = params[:name]
           plan.summary = params[:summary]
           plan.description = params[:description]
+          plan.product_id = params[:product_id].present? ? params[:product_id].to_i : nil
           plan.save
-          p_ids = params[:product_ids].find_all{|i| !i.blank? }.map(&:to_i)
-          plan.products.each do |product|
-            unless(p_ids.include?(product.id))
-              plan.remove_product(product)
-            end
-          end
-          n_ids = p_ids - plan.products.map(&:id)
-          unless(n_ids.empty?)
-            Product.where(:id => n_ids).all.each do |product|
-              plan.add_product(product)
+          plan.price = params[:price].to_i
+          plan.remove_all_product_features
+          if(params[:product_features].present?)
+            ProductFeature.where(:id => params[:product_features].map(&:to_i)).all.each do |f|
+              plan.add_product_feature(f)
             end
           end
           flash[:success] = "Plan updated (#{plan.name})"

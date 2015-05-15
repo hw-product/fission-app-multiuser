@@ -7,11 +7,15 @@
     if(defined?(permission_ids))
       attrs['permission-ids'] = permission_ids.join(',')
     end
+    if(defined?(feature_price))
+      attrs['feature-price'] = feature_price
+    end
     attrs['id'] = SecureRandom.uuid
   end
 
 %tr.row{row_attrs}
-  %td.feature-expander= feature_name.humanize
+  %td.feature-expander.feature-name= feature_name
+  %td.feature-expander.feature-price= "$#{defined?(feature_price) ? feature_price : 0}.00"
   %td
     %a.btn.btn-danger.btn-xs.feature-del.pull-right{:href => '#'}
       %span.glyphicon.glyphicon-trash

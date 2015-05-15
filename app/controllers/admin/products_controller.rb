@@ -47,6 +47,9 @@ class Admin::ProductsController < ApplicationController
             next if perm_id.blank?
             feature.add_permission(Permission.find_by_id(perm_id))
           end
+          if(params[:product_feature_name_price][f_name].present?)
+            feature.price = params[:product_feature_name_price][f_name].to_i
+          end
         end
         flash[:success] = "New product created! (#{product.name})"
         redirect_to admin_products_path
@@ -117,6 +120,15 @@ class Admin::ProductsController < ApplicationController
             perm_ids.split(',').map(&:strip).each do |perm_id|
               next if perm_id.blank?
               feature.add_permission(Permission.find_by_id(perm_id))
+            end
+            if(params[:product_feature_name_price][f_name].present?)
+              puts '! ' * 10000
+              feature.price = params[:product_feature_name_price][f_name].to_i
+            end
+          end
+          product.product_features.each do |feature|
+            if(params[:product_feature_id_price][feature.id.to_s].present?)
+              feature.price = params[:product_feature_id_price][feature.id.to_s].to_i
             end
           end
           flash[:success] = "Product updated! (#{product.name})"
