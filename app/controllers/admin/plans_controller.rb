@@ -39,6 +39,11 @@ class Admin::PlansController < ApplicationController
           :product_id => params[:product_id].present? ? params[:product_id].to_i : nil
         )
         plan.price = params[:price].to_i
+        if(params[:product_features].present?)
+          ProductFeature.where(:id => params[:product_features].map(&:to_i)).all.each do |f|
+            plan.add_product_feature(f)
+          end
+        end
         flash[:success] = "New plan created! (#{plan.name})"
         redirect_to admin_plans_path
       end
