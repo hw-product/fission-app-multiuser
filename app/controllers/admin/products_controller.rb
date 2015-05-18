@@ -86,6 +86,7 @@ class Admin::ProductsController < ApplicationController
         product = Product.find_by_id(params[:id])
         if(product)
           [:name, :vanity_dns, :service_group_id].each do |key|
+            next if params[key].blank?
             product.send("#{key}=", params[key])
           end
           product.save
@@ -122,7 +123,6 @@ class Admin::ProductsController < ApplicationController
               feature.add_permission(Permission.find_by_id(perm_id))
             end
             if(params[:product_feature_name_price][f_name].present?)
-              puts '! ' * 10000
               feature.price = params[:product_feature_name_price][f_name].to_i
             end
           end
