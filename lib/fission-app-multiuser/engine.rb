@@ -5,7 +5,7 @@ module FissionApp
       config.to_prepare do |config|
         # NOTE: This is the default admin account
         src = Fission::Data::Models::Source.find_or_create(:name => 'internal')
-        Fission::Data::Models::Account.find_or_create(
+        admin_account = Fission::Data::Models::Account.find_or_create(
           :name => 'fission-admin',
           :source_id => src.id
         )
@@ -22,6 +22,9 @@ module FissionApp
         )
         unless(feature.permissions.include?(permission))
           feature.add_permission(permission)
+        end
+        unless(admin_account.product_features.include?(feature))
+          admin_account.add_product_feature(feature)
         end
       end
 
