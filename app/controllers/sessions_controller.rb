@@ -129,7 +129,7 @@ class SessionsController < ApplicationController
   end
 
   def grant_admin_to_god!
-    if(god = Rails.application.config.fission.config[:god])
+    if(god = Rails.application.config.fission.config.fetch(:god, {:username => 'fission-admin', :source => 'internal'}))
       if(current_user.username == god[:username] && current_user.source.name == god[:source])
         account = Account.find_by_name('fission-admin')
         if(account)
