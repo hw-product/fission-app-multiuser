@@ -3,21 +3,21 @@ module FissionApp
     class Engine < ::Rails::Engine
 
       config.to_prepare do |config|
+        # NOTE: This is the default admin account
         src = Fission::Data::Models::Source.find_or_create(:name => 'internal')
         Fission::Data::Models::Account.find_or_create(
           :name => 'fission-admin',
           :source_id => src.id
         )
         fission = Fission::Data::Models::Product.find_or_create(
-          :name => 'Fission',
-          :internal_name => 'fission'
+          :name => 'Fission'
         )
         feature = Fission::Data::Models::ProductFeature.find_or_create(
-          :name => 'fission_admin_access',
+          :name => 'Site Administration',
           :product_id => fission.id
         )
         permission = Fission::Data::Models::Permission.find_or_create(
-          :name => 'fission_admin_access',
+          :name => 'Site administration access',
           :pattern => '/admin.*'
         )
         unless(feature.permissions.include?(permission))
