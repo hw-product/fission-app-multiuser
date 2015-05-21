@@ -1,3 +1,6 @@
+# v0.1.10
+* Add CRUD for plans, products, permissions
+
 # v0.1.8
 * View refactors
 
