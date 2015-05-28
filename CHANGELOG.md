@@ -1,3 +1,6 @@
+# v0.1.12
+* Default account to user's account on login
+
 # v0.1.10
 * Add CRUD for plans, products, permissions
 
