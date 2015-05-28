@@ -46,6 +46,10 @@ class SessionsController < ApplicationController
         @current_user = nil
         if(user)
           session[:user_id] = user.id
+          user_act = user.accounts.detect do |act|
+            act.name == user.username
+          end
+          session[:current_account_id] = user_act.id if user_act.id
         else
           Rails.logger.error "Failed to create user!"
           raise Error.new('Failed to create new user', :status => :internal_server_error)
