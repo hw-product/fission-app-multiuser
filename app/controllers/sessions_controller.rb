@@ -50,6 +50,7 @@ class SessionsController < ApplicationController
             act.name == user.username
           end
           session[:current_account_id] = user_act.id if user_act.id
+          session[:validator] = user_checksum(user)
         else
           Rails.logger.error "Failed to create user!"
           raise Error.new('Failed to create new user', :status => :internal_server_error)
