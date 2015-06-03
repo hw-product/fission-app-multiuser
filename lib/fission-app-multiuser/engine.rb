@@ -3,6 +3,7 @@ module FissionApp
     class Engine < ::Rails::Engine
 
       config.to_prepare do |config|
+        require 'fission-app-multiuser/styler'
         # NOTE: This is the default admin account
         src = Fission::Data::Models::Source.find_or_create(:name => 'internal')
         admin_account = Fission::Data::Models::Account.find_or_create(
