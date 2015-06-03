@@ -43,6 +43,7 @@ module FissionApp
       # Generate new CSS file
       #
       # @return [String] path to new style asset
+      # @todo still needs compression
       def compile
         manifest = Sprockets::Manifest.new(Rails.application.assets.dup, '/tmp/assets/compiled', Rails.application.config.assets.manifest)
         manifest.clobber
