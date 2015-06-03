@@ -10,7 +10,7 @@ module FissionApp
       # @return [String] name of product
       attr_reader :product_name
       # @return [Hash] key value pair overrides for theme
-      attr_reader :overrides
+      attr_reader :style_overrides
 
       # Create new instance
       #
@@ -30,13 +30,14 @@ module FissionApp
       # @return [String] path to SCSS file
       def scss_file
         memoize(:scss_file) do
-          path = File.join('/tmp', 'assets', "#{product_name}.scss")
+          path = File.join('/tmp', 'assets', "#{product_name}.css.scss")
           File.open(path, 'w+') do |file|
-            overrides.each do |k,v|
-              file.puts "#{k}: #{v};"
+            file.puts "/*\n * = require_self\n * = require application\n */"
+            style_overrides.each do |k,v|
+              file.puts "$#{k}: #{v};"
             end
-            file.puts "//= application"
           end
+          path
         end
       end
 
