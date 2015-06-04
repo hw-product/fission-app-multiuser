@@ -27,6 +27,16 @@ module FissionApp
         unless(admin_account.product_features.include?(feature))
           admin_account.add_product_feature(feature)
         end
+
+        # Ensure any required custom product stylings are generated
+        Fission::Data::Models::Product.all.each do |product|
+          if(product.product_style)
+            FissionApp::Multiuser::Styler.new(
+              product.internal_name,
+              product.product_style.style
+            ).compile
+          end
+        end
       end
 
       # @return [Array<Fission::Data::Models::Product>]
