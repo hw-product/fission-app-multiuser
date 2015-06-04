@@ -27,6 +27,16 @@ module FissionApp
         unless(admin_account.product_features.include?(feature))
           admin_account.add_product_feature(feature)
         end
+
+        ([ApplicationController] + ApplicationController.descendants).each do |klass|
+          klass.class_eval do
+            before_action do
+              if(isolated_product? && @product.product_style)
+                @site_style = product_style_path(@product.internal_name)
+              end
+            end
+          end
+        end
       end
 
       config.after_initialize do
