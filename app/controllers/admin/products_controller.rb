@@ -38,9 +38,9 @@ class Admin::ProductsController < ApplicationController
         create_args.delete_if{|k,v|
           ![:name, :vanity_dns, :service_group_id].include?(k.to_sym) || v.blank?
         }
-        product = Product.create(create_args)
+        product = Product.find_or_create(create_args)
         params.fetch(:product_feature_names, {}).each do |f_name, perm_ids|
-          feature = ProductFeature.create(
+          feature = ProductFeature.find_or_create(
             :name => f_name,
             :product_id => product.id
           )
@@ -59,10 +59,9 @@ class Admin::ProductsController < ApplicationController
             end
           end
         end
-        ProductStyle.find_or_create(
-          :product_id => product.id,
-          :style => overrides
-        )
+        style = product.product_style || ProductStyle.new(:product_id => product.id)
+        style.style = overrides
+        style.save
         FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
         flash[:success] = "New product created! (#{product.name})"
         redirect_to admin_products_path
