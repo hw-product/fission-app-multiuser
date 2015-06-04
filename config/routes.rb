@@ -40,4 +40,6 @@ Rails.application.routes.draw do
 
   get 'register', :to => 'users#new', :as => :registration
 
+  get 'style/:name.css', :to => 'product_style#stylesheet', :as => :product_style
+
 end
