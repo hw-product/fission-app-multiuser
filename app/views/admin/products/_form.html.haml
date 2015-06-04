@@ -16,6 +16,14 @@
         - @product.product_features_dataset.order(:name).all.each do |feature|
           = render :partial => 'product_feature', :locals => {:feature_name => feature.name, :feature_id => feature.id, :feature_price => feature.cost, :permission_ids => feature.permissions.map(&:id)}
   %br
+  %fieldset
+    %legend
+      Custom Styling
+    - @style_keys.each_slice(3) do |s_keys|
+      .row
+        - s_keys.each do |s_key|
+          .col-md-4
+            = f.color_field s_key, :name => "style_colors[#{s_key}]", :label => s_key.tr('-', ' ').humanize
   = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
 
 :javascript
