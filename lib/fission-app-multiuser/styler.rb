@@ -23,7 +23,7 @@ module FissionApp
       # @param product_name [String]
       # @param overrides [Hash]
       # @return [self]
-      def initialize(product_name, overrides)
+      def initialize(product_name=nil, overrides=nil)
         @product_name = product_name
         @style_overrides = overrides
         @styles_root = Rails.application.config.settings.fetch(
@@ -49,10 +49,10 @@ module FissionApp
           )
           FileUtils.mkdir_p(File.dirname(path))
           File.open(path, 'w+') do |file|
-            file.puts "/*\n * = require_self\n * = require application\n */"
             style_overrides.each do |k,v|
               file.puts "$#{k}: #{v};"
             end
+            file.puts "@import 'application';"
           end
           path
         end
@@ -79,7 +79,7 @@ module FissionApp
           manifest.clobber
           manifest.environment.append_path(gen_dir)
           manifest.compile(scss_file)
-          FileUtils.mv(
+          FileUtils.cp(
             File.join(
               gen_dir,
               'compiled',
