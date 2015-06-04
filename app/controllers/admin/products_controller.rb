@@ -20,6 +20,7 @@ class Admin::ProductsController < ApplicationController
         javascript_redirect_to admin_products_path
       end
       format.html do
+        @style_keys = style_keys
         @service_groups = ServiceGroup.order(:name).all
         @permissions = Permission.order(:name).all
       end
@@ -51,6 +52,18 @@ class Admin::ProductsController < ApplicationController
             feature.price = params[:product_feature_name_price][f_name].to_i
           end
         end
+        if(params[:style_colors] && !params[:style_colors].empty?)
+          overrides = Smash.new.tap do |od|
+            params[:style_colors].each do |name, value|
+              od[name] = value
+            end
+          end
+        end
+        ProductStyle.find_or_create(
+          :product_id => product.id,
+          :style => overrides
+        )
+        FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
         flash[:success] = "New product created! (#{product.name})"
         redirect_to admin_products_path
       end
@@ -66,6 +79,7 @@ class Admin::ProductsController < ApplicationController
       format.html do
         @product = Product.find_by_id(params[:id])
         if(@product)
+          @style_keys = style_keys
           @service_groups = ServiceGroup.order(:name).all
           @permissions = Permission.order(:name).all
         else
@@ -130,6 +144,17 @@ class Admin::ProductsController < ApplicationController
               feature.price = params[:product_feature_id_price][feature.id.to_s].to_i
             end
           end
+          if(params[:style_colors] && !params[:style_colors].empty?)
+            overrides = Smash.new.tap do |od|
+              params[:style_colors].each do |name, value|
+                od[name] = value
+              end
+            end
+          end
+          style = product.product_style || ProductStyle.new(:product_id => product.id)
+          style.style = overrides
+          style.save
+          FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
           flash[:success] = "Product updated! (#{product.name})"
           redirect_to admin_products_path
         else
@@ -156,6 +181,17 @@ class Admin::ProductsController < ApplicationController
         redirect_to admin_products_path
       end
     end
+  end
+
+  protected
+
+  def style_keys
+    File.readlines(File.join(Rails.root, 'app', 'assets', 'stylesheets', 'theme', 'colors.css.scss')).map do |item|
+      item.strip!
+      if(item.start_with?('$') && item.end_with?(';'))
+        item.split(':').first.strip.sub('$', '')
+      end
+    end.compact
   end
 
 end
