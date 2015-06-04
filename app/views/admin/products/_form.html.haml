@@ -19,16 +19,34 @@
   %fieldset
     %legend
       Custom Styling
-    - @style_keys.each_slice(3) do |s_keys|
-      .row
-        - s_keys.each do |s_key|
-          .col-md-4
-            = f.color_field s_key, :name => "style_colors[#{s_key}]", :label => s_key.tr('-', ' ').humanize
+    #style-overrides
+      - @style_keys.each_slice(3) do |s_keys|
+        - if @product && @product.product_style
+          - s_keys.each do |s_key|
+            - next unless @product.product_style.style[s_key]
+            = f.color_field s_key, :name => "style_colors[#{s_key}]", :value => @product.product_style.style[s_key], :label => s_key.tr('-', ' ').humanize
+    %br
+    .dropdown.pull-right
+      %button.btn.btn-primary#style-add{:type => 'button', 'data-toggle' => 'dropdown', 'aria-haspopup' => true, 'aria-expanded' => false}
+        Add Override
+        %span.caret
+      %ul.dropdown-menu{:role => 'menu', 'aria-labelledby' => 'style-add'}
+        - (@style_keys - (@product && @product.product_style ? @product.product_style.keys : [])).each do |key|
+          %li= link_to key.tr('-', ' ').humanize, '#', :id => "#{key}-add", :class => 'style-adder', 'override-name' => key, 'override-label' => key.tr('-', ' ').humanize
+    .clearfix
+    %br
   = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
 
 :javascript
   $(document).ready(
     function(){
+      $('.style-adder').click(function(){
+        o_name = $(this).attr('override-name');
+        o_label = $(this).attr('override-label');
+        $('#style-overrides').append('<div class="form-group"><label class="control-label" for="' + o_name + '">' + o_label + '</label><input class="form-control" type="color" name="style_colors[' + $(this).attr('override-name') + ']" id="style_' + o_name + '" /></div>');
+        $(this).remove();
+      });
+
       $('#product-form').submit(function(event){
         $(this).find('#product-features .row').each(function(idx, elm){
           if($(elm).attr('feature-id')){
