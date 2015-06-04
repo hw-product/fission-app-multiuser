@@ -27,7 +27,9 @@ module FissionApp
         unless(admin_account.product_features.include?(feature))
           admin_account.add_product_feature(feature)
         end
+      end
 
+      config.after_initialize do
         # Ensure any required custom product stylings are generated
         Fission::Data::Models::Product.all.each do |product|
           if(product.product_style)
