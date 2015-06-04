@@ -24,13 +24,23 @@ module FissionApp
 
       # @return [String] path to CSS file
       def css_file
-        File.join('/tmp', 'assets', "#{product_name}.css")
+        File.join(
+          Rails.application.config.settings.fetch(
+            'styling', 'path', '/tmp/fission-styling'
+          ),
+          "#{product_name}.css"
+        )
       end
 
       # @return [String] path to SCSS file
       def scss_file
         memoize(:scss_file) do
-          path = File.join('/tmp', 'assets', "#{product_name}.css.scss")
+          path = File.join(
+            Rails.application.config.settings.fetch(
+              'styling', 'tmp', '/tmp/fission-styling'
+            ),
+            "#{product_name}.css.scss"
+          )
           File.open(path, 'w+') do |file|
             file.puts "/*\n * = require_self\n * = require application\n */"
             style_overrides.each do |k,v|
@@ -46,11 +56,32 @@ module FissionApp
       # @return [String] path to new style asset
       # @todo still needs compression
       def compile
-        manifest = Sprockets::Manifest.new(Rails.application.assets.dup, '/tmp/assets/compiled', Rails.application.config.assets.manifest)
+        manifest = Sprockets::Manifest.new(
+          Rails.application.assets.dup,
+          File.join(
+            Rails.application.config.settings.fetch(
+              'styling', 'tmp', '/tmp/fission-styling'
+            ),
+            'compiled'
+          ),
+          Rails.application.config.assets.manifest
+        )
         manifest.clobber
-        manifest.environment.append_path('/tmp/assets')
+        manifest.environment.append_path(
+          Rails.application.config.settings.fetch(
+            'styling', 'tmp', '/tmp/fission-styling'
+          )
+        )
         manifest.compile(scss_file)
-        FileUtils.mv(File.join('/tmp/assets/compiled', manifest.files.keys.first), css_file)
+        FileUtils.mv(
+          File.join(
+            Rails.application.config.settings.fetch(
+              'styling', 'tmp', '/tmp/fission-styling'
+            ),
+            manifest.files.keys.first
+          ),
+          css_file
+        )
         css_file
       end
 
