@@ -1,3 +1,6 @@
+# v0.1.16
+* Fix: Disable product init on asset precompile
+
 # v0.1.14
 * Add dynamic style generator (product specific styling overrides)
 
