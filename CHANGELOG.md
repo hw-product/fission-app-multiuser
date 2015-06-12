@@ -1,3 +1,6 @@
+# v0.1.14
+* Add dynamic style generator (product specific styling overrides)
+
 # v0.1.12
 * Default account to user's account on login
 
