@@ -41,12 +41,14 @@ module FissionApp
 
       config.after_initialize do
         # Ensure any required custom product stylings are generated
-        Fission::Data::Models::Product.all.each do |product|
-          if(product.product_style)
-            FissionApp::Multiuser::Styler.new(
-              product.internal_name,
-              product.product_style.style
-            ).compile
+        unless(ENV['RAILS_ASSETS_PRECOMPILE'])
+          Fission::Data::Models::Product.all.each do |product|
+            if(product.product_style)
+              FissionApp::Multiuser::Styler.new(
+                product.internal_name,
+                product.product_style.style
+              ).compile
+            end
           end
         end
       end
