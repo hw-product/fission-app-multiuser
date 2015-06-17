@@ -58,11 +58,11 @@ class Admin::ProductsController < ApplicationController
               od[name] = value
             end
           end
+          style = product.product_style || ProductStyle.new(:product_id => product.id)
+          style.style = overrides
+          style.save
+          FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
         end
-        style = product.product_style || ProductStyle.new(:product_id => product.id)
-        style.style = overrides
-        style.save
-        FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
         flash[:success] = "New product created! (#{product.name})"
         redirect_to admin_products_path
       end
@@ -149,11 +149,16 @@ class Admin::ProductsController < ApplicationController
                 od[name] = value
               end
             end
+            style = product.product_style || ProductStyle.new(:product_id => product.id)
+            style.style = overrides
+            style.save
+            FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
+          else
+            ProductStyle.where(:product_id => product.id).destroy
+            if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
+              FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
+            end
           end
-          style = product.product_style || ProductStyle.new(:product_id => product.id)
-          style.style = overrides
-          style.save
-          FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
           flash[:success] = "Product updated! (#{product.name})"
           redirect_to admin_products_path
         else
@@ -167,6 +172,9 @@ class Admin::ProductsController < ApplicationController
   def destroy
     product = Product.find_by_id(params[:id])
     if(product)
+      if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
+        FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
+      end
       product.destroy
       flash[:warning] = 'Product has been destroyed!'
     else
