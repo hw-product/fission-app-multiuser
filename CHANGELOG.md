@@ -1,3 +1,6 @@
+# v0.1.18
+* Remove styles when custom styling is empty
+
 # v0.1.16
 * Fix: Disable product init on asset precompile
 
