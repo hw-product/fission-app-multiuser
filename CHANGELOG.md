@@ -1,3 +1,6 @@
+# v0.1.22
+* Add basic account token CRUD
+
 # v0.1.20
 * Disable styling until updated for sprockets and we are ready for it
 
