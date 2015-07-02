@@ -1,0 +1,31 @@
+- content_for(:heading_title) do
+  = link_to('Create', new_account_token_path, :class => 'btn btn-success btn-sm pull-right')
+  .clearfix
+
+- content_for(:token_list) do
+  - @tokens.each do |token|
+    %tr.linked{:href => edit_account_token_path(token)}
+      %td= token.name
+      %td= token.description
+      %td= token.created_at
+
+:ruby
+  id = 'account-tokens'
+  content_for(:container) do
+    render(
+      :partial => 'layouts/panel',
+      :locals => {
+        :id => id,
+        :heading => ("Tokens for #{@account.name}" + yield(:heading_title)).html_safe,
+        :panel_content => render(
+          :partial => 'layouts/table',
+          :locals => {
+            :header_data => ['Name', 'Description', 'Created', ''],
+            :table_content_name => :token_list
+          }
+        )
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => {:container_class => "#{id}-list", :container_id => id})

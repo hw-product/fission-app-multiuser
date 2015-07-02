@@ -1,0 +1,6 @@
+= bootstrap_form_tag form_opts.merge(:html => {:id => 'account-token-form'}) do |f|
+  = f.text_field :name, :value => @token ? @token.name : nil
+  = f.text_field :description, :value => @token ? @token.description : nil
+  - if @token
+    = f.text_field :token_value, :value => @token.token, :disabled => true
+  = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success'

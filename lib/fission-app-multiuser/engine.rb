@@ -28,6 +28,19 @@ module FissionApp
           admin_account.add_product_feature(feature)
         end
 
+        product = Fission::Data::Models::Product.find_or_create(:name => 'Tokens')
+        feature = Fission::Data::Models::ProductFeature.find_or_create(
+          :name => 'Account token generation',
+          :product_id => product.id
+        )
+        permission = Fission::Data::Models::Permission.find_or_create(
+          :name => 'Account token access',
+          :pattern => '/account/token.*'
+        )
+        unless(feature.permissions.include?(permission))
+          feature.add_permission(permission)
+        end
+
         ([ApplicationController] + ApplicationController.descendants).each do |klass|
           klass.class_eval do
             before_action do
@@ -55,7 +68,8 @@ module FissionApp
 
       # @return [Array<Fission::Data::Models::Product>]
       def fission_product
-        [Fission::Data::Models::Product.find_by_internal_name('fission')]
+        [Fission::Data::Models::Product.find_by_internal_name('fission'),
+          Fission::Data::Models::Product.find_by_internal_name('tokens')]
       end
 
       # @return [Hash] navigation
@@ -69,6 +83,11 @@ module FissionApp
             'Plans' => Rails.application.routes.url_helpers.admin_plans_path
           )
         )
+      end
+
+      # @return [Hash] account navigation
+      def fission_account_navigation(*_)
+        Smash.new('Tokens' => Rails.application.routes.url_helpers.account_tokens_path)
       end
 
     end

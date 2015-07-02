@@ -20,9 +20,9 @@ Rails.application.routes.draw do
 
   end
 
-  # resources :accounts do
-  #   resources :tokens
-  # end
+  namespace :account do
+    resources :tokens
+  end
 
   # resources :users do
   #   resources :tokens
