@@ -1,3 +1,6 @@
+# v0.1.20
+* Disable styling until updated for sprockets and we are ready for it
+
 # v0.1.18
 * Remove styles when custom styling is empty
 
