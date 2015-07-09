@@ -45,7 +45,7 @@ module FissionApp
           klass.class_eval do
             before_action do
               if(isolated_product? && @product.product_style)
-                @site_style = product_style_path(@product.internal_name)
+#                @site_style = product_style_path(@product.internal_name)
               end
             end
           end
