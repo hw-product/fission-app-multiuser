@@ -1,3 +1,6 @@
+# v0.1.24
+* Remove styling override until styling helper re-enabled
+
 # v0.1.22
 * Add basic account token CRUD
 
