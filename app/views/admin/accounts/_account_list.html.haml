@@ -1,3 +1,7 @@
+- unless content_for?(:assume_button)
+  - content_for(:assume_button) do
+    %span.glyphicon.glyphicon-flash
+
 - content_for(:pagination_) do
   - if content_for?(pagination)
     %div.fission-pagination.well.well-sm= content_for(pagination)
@@ -5,13 +9,16 @@
 - content_for(:panel) do
   = content_for(:pagination_)
 
-  - header_data = ['Name', 'Source']
-  - header_classes = ['col-md-3', 'col-md-9']
+  - header_data = ['Name', 'Source', 'Total Jobs', 'Assume']
+  - header_classes = ['col-md-5', 'col-md-4', 'col-md-2', 'col-md-1']
   - content_for(:table_body) do
     - accounts.each do |account|
       %tr.linked{ href: admin_account_path(account) }
         %td= account.name
         %td= account.source.name
+        %td= account.jobs_dataset.select(:message_id).group_by(:message_id).count
+        %td{:style => 'text-align:center'}= link_to yield(:assume_button), assume_admin_account_path(account), :class => 'btn btn-xs btn-warning'
+
   = render(:partial => 'layouts/table', :locals => { :header_data => header_data, :header_classes => header_classes  })
 
   = content_for(:pagination_)

@@ -76,19 +76,40 @@ class Admin::AccountsController < ApplicationController
 
   # Disable all resource methods by default
   def new
-    redirection_url = default_url
+    redirection_path = default_url
     flash[:error] = 'Requested action is disabled'
     respond_to do |format|
       format.js do
-        javascript_redirect_to redirection_url
+        javascript_redirect_to redirection_path
       end
       format.html do
-        redirect_to redirection_url
+        redirect_to redirection_pathxo
       end
     end
   end
   alias_method :create, :new
   alias_method :edit, :new
   alias_method :destroy, :new
+
+  def assume
+    respond_to do |format|
+      format.js do
+        flash[:error] = 'Unsupported request'
+        javascript_redirect_to default_url
+      end
+      format.html do
+        account = Account.find_by_id(params[:id])
+        if(account)
+          flash[:warn] = "Remote account has been assumed! Account: #{account.name}"
+          current_user.session[:fission_admin] = true
+          current_user.session[:current_account_id] = account.id
+          redirect_to default_url
+        else
+          flash[:error] = 'Failed to locate requested account. Unable to assume account!'
+          redirect_to admin_accounts_path
+        end
+      end
+    end
+  end
 
 end
