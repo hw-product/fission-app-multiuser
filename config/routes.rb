@@ -2,6 +2,9 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :accounts do
+      member do
+        get :assume
+      end
       # resources :users
       # resources :permissions
       # resources :tokens
