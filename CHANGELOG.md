@@ -1,3 +1,7 @@
+# v0.1.26
+* Include job totals on account list
+* Add admin support for assuming accounts
+
 # v0.1.24
 * Remove styling override until styling helper re-enabled
 
