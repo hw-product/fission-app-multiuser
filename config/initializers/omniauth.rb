@@ -19,6 +19,9 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       host_key ||= 'default'
       env['omniauth.strategy'].options[:client_id] = Rails.application.config.fission.github[host_key][:key]
       env['omniauth.strategy'].options[:client_secret] = Rails.application.config.fission.github[host_key][:secret]
+      if(Rails.env.production?)
+        env['omniauth.strategy'].options[:redirect_uri] = "https://#{env['SERVER_NAME']}/auth/github/callback"
+      end
       env['omniauth.strategy'].options[:scope] = 'user:email,repo'
     }
   )
