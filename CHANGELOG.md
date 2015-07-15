@@ -1,3 +1,6 @@
+# v0.1.28
+* [fix] allow server name glob match on github auth config
+
 # v0.1.26
 * Include job totals on account list
 * Add admin support for assuming accounts
