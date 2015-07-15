@@ -1,3 +1,7 @@
+# v0.1.30
+* Revert glob match on auth config
+* Add glob dns field to admin product view
+
 # v0.1.28
 * [fix] allow server name glob match on github auth config
 
