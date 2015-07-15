@@ -3,6 +3,7 @@
   - if @product
     = f.text_field :internal_name, :value => @product.internal_name, :disabled => true
   = f.text_field :vanity_dns, :value => @product ? @product.vanity_dns : nil
+  = f.text_field :glob_dns, :value => @product ? @product.glob_dns : nil
   = f.select :service_group_id, @service_groups.map{|g| [g.name, g.id]}.unshift(['','']), :selected => @product && @product.service_group ? @product.service_group.id : ''
   %br
   %fieldset
@@ -16,12 +17,12 @@
         - @product.product_features_dataset.order(:name).all.each do |feature|
           = render :partial => 'product_feature', :locals => {:feature_name => feature.name, :feature_id => feature.id, :feature_price => feature.cost, :permission_ids => feature.permissions.map(&:id)}
   %br
-  %fieldset
+  -# %fieldset
     %legend
       Custom Styling
     #style-overrides
       - @style_keys.each_slice(3) do |s_keys|
-        - if @product && @product.product_style
+        - if false && @product && @product.product_style
           - s_keys.each do |s_key|
             - next unless @product.product_style.style[s_key]
             = f.color_field s_key, :name => "style_colors[#{s_key}]", :value => @product.product_style.style[s_key], :label => s_key.tr('-', ' ').humanize
@@ -31,11 +32,12 @@
         Add Override
         %span.caret
       %ul.dropdown-menu{:role => 'menu', 'aria-labelledby' => 'style-add'}
-        - (@style_keys - (@product && @product.product_style ? @product.product_style.keys : [])).each do |key|
-          %li= link_to key.tr('-', ' ').humanize, '#', :id => "#{key}-add", :class => 'style-adder', 'override-name' => key, 'override-label' => key.tr('-', ' ').humanize
+        - # (@style_keys - (@product && @product.product_style ? @product.product_style.keys : [])).each do |key|
+        - #%li= link_to key.tr('-', ' ').humanize, '#', :id => "#{key}-add", :class => 'style-adder', 'override-name' => key, 'override-label' => key.tr('-', ' ').humanize
     .clearfix
     %br
   = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
+  .clearfix
 
 :javascript
   $(document).ready(

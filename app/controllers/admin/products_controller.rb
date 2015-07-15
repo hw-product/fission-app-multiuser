@@ -36,7 +36,7 @@ class Admin::ProductsController < ApplicationController
       format.html do
         create_args = params.dup
         create_args.delete_if{|k,v|
-          ![:name, :vanity_dns, :service_group_id].include?(k.to_sym) || v.blank?
+          ![:name, :vanity_dns, :glob_dns, :service_group_id].include?(k.to_sym) || v.blank?
         }
         product = Product.find_or_create(create_args)
         params.fetch(:product_feature_names, {}).each do |f_name, perm_ids|
@@ -98,7 +98,7 @@ class Admin::ProductsController < ApplicationController
       format.html do
         product = Product.find_by_id(params[:id])
         if(product)
-          [:name, :vanity_dns, :service_group_id].each do |key|
+          [:name, :vanity_dns, :glob_dns, :service_group_id].each do |key|
             product.send("#{key}=", params[key].blank? ? nil : params[key])
           end
           product.save
