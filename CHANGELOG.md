@@ -1,3 +1,6 @@
+# v0.1.32
+* Allow GH authorization access to be user controlled
+
 # v0.1.30
 * Revert glob match on auth config
 * Add glob dns field to admin product view
