@@ -1,0 +1,29 @@
+- content_for(:heading) do
+  %h4
+    Update access permissions
+
+- content_for(:footer) do
+  .pull-right
+    %i.fa.fa-github-square
+  .clearfix
+
+- content_for(:panel) do
+  .row
+    .col-md-6
+      %a.button.btn.btn-xs.btn-default.auth{ href: '/auth/github?access=public' }
+        %i.fa.fa-unlock
+        Public Repos
+    .col-md-6
+      %a.button.btn.btn-xs.btn-default.auth.pull-right{ href: '/auth/github?access=all' }
+        %i.fa.fa-lock
+        All Repos
+
+- content_for(:container) do
+  .row
+    .col-md-3
+    .col-md-6
+      = render :partial => 'layouts/panel', :locals => {:id => 'access', :heading => content_for(:heading), :footer => content_for(:footer), :panel_class => 'panel-warning'}
+    .col-md-3
+
+
+= render :partial => 'layouts/container'

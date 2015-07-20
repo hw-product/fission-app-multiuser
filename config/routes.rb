@@ -27,9 +27,9 @@ Rails.application.routes.draw do
     resources :tokens
   end
 
-  # resources :users do
-  #   resources :tokens
-  # end
+  # resources :users
+
+  get 'user/access', :to => 'users#access', :as => :user_access
 
   get 'login', :to => 'sessions#new', :as => :new_session
   get 'logout', :to => 'sessions#destroy', :as => :destroy_session

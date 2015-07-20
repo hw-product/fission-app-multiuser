@@ -16,9 +16,18 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       unless(Rails.application.config.fission.github.keys.include?(host_key))
         host_key = 'default'
       end
+      params = Rack::Utils.parse_query(URI.parse(env['REQUEST_URI']).query)
+      case params['access']
+      when 'public'
+        scope = 'user,public_repo'
+      when 'all'
+        scope = 'user,repo'
+      else
+        scope = ''
+      end
       env['omniauth.strategy'].options[:client_id] = Rails.application.config.fission.github[host_key][:key]
       env['omniauth.strategy'].options[:client_secret] = Rails.application.config.fission.github[host_key][:secret]
-      env['omniauth.strategy'].options[:scope] = 'user:email,repo'
+      env['omniauth.strategy'].options[:scope] = scope unless scope.empty?
     }
   )
 end
