@@ -73,21 +73,39 @@ module FissionApp
       end
 
       # @return [Hash] navigation
-      def fission_navigation(*_)
-        Smash.new(
-          'Admin' => Smash.new(
-            'Accounts' => Rails.application.routes.url_helpers.admin_accounts_path,
-            'Sources' => Rails.application.routes.url_helpers.admin_sources_path,
-            'Products' => Rails.application.routes.url_helpers.admin_products_path,
-            'Permissions' => Rails.application.routes.url_helpers.admin_permissions_path,
-            'Plans' => Rails.application.routes.url_helpers.admin_plans_path
+      def fission_navigation(product, *_)
+        if(product.internal_name == 'fission')
+          Smash.new(
+            'Admin' => Smash.new(
+              'Accounts' => Rails.application.routes.url_helpers.admin_accounts_path,
+              'Sources' => Rails.application.routes.url_helpers.admin_sources_path,
+              'Products' => Rails.application.routes.url_helpers.admin_products_path,
+              'Permissions' => Rails.application.routes.url_helpers.admin_permissions_path,
+              'Plans' => Rails.application.routes.url_helpers.admin_plans_path
+            )
           )
-        )
+        else
+          Smash.new
+        end
       end
 
       # @return [Hash] account navigation
-      def fission_account_navigation(*_)
-        Smash.new('Tokens' => Rails.application.routes.url_helpers.account_tokens_path)
+      def fission_account_navigation(product, *_)
+        if(product.internal_name == 'tokens')
+          Smash.new('Tokens' => Rails.application.routes.url_helpers.account_tokens_path)
+        else
+          Smash.new
+        end
+      end
+
+      # @return [Hash] user navigation
+      def fission_user_navigation(product, user)
+        Smash.new('Access' => Rails.application.routes.url_helpers.user_access_path)
+      end
+
+      # @return [Array<Fission::Models::Permission>] default permissions
+      def default_user_permissions(*_)
+        Fission::Data::Models::Permission.new(:pattern => '/users?/.+')
       end
 
     end

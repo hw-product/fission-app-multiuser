@@ -1,14 +1,18 @@
 class SessionsController < ApplicationController
 
   before_action :validate_user!, :except => [:new, :create, :failure, :authenticate, :destroy]
-  before_action :validate_access!, :except => [:destroy], :if => lambda{ user_mode? && valid_user? }
+  before_action :validate_access!, :except => [:new, :destroy, :create, :authenticate, :failure], :if => lambda{ user_mode? && valid_user? }
   after_action :save_user_session, :except => [:destroy], :if => lambda{ user_mode? && valid_user? }
 
   def new
     respond_to do |format|
       format.html do
-        @session = Session.new
-        @provider = Rails.application.config.omniauth_provider
+        if(valid_user?)
+          redirect_to dashboard_path
+        else
+          @session = Session.new
+          @provider = Rails.application.config.omniauth_provider
+        end
       end
     end
   end
@@ -32,31 +36,36 @@ class SessionsController < ApplicationController
       format.html do
         user = nil
         provider = (params[:provider] || auth_hash.try(:[], :provider)).try(:to_sym)
-        case provider
-        when :github
-          ident = Identity.find_or_create_via_omniauth(auth_hash)
-          @current_user = user = ident.user
-          session[:random] = current_user.run_state.random_sec
-          register_github_orgs
-        when :internal
-          user = User.create(params.merge(:provider => :internal))
-        else
-          raise Error.new('Unsupported provider authentication attempt', :status => :internal_server_error)
-        end
-        @current_user = nil
-        if(user)
-          session[:user_id] = user.id
-          user_act = user.accounts.detect do |act|
-            act.name == user.username
+        begin
+          case provider
+          when :github
+            ident = Identity.find_or_create_via_omniauth(auth_hash)
+            @current_user = user = ident.user
+            session[:random] = current_user.run_state.random_sec
+            register_github_orgs
+          when :internal
+            user = User.create(params.merge(:provider => :internal))
+          else
+            raise Error.new('Unsupported provider authentication attempt', :status => :internal_server_error)
           end
-          session[:current_account_id] = user_act.id if user_act.id
-          session[:validator] = user_checksum(user)
-        else
-          Rails.logger.error "Failed to create user!"
-          raise Error.new('Failed to create new user', :status => :internal_server_error)
+          @current_user = nil
+          if(user)
+            session[:user_id] = user.id
+            user_act = user.accounts.detect do |act|
+              act.name == user.username
+            end
+            session[:current_account_id] = user_act.id if user_act.id
+            session[:validator] = user_checksum(user)
+          else
+            Rails.logger.error "Failed to create user!"
+            raise Error.new('Failed to create new user', :status => :internal_server_error)
+          end
+          grant_admin_to_god!
+          redirect_to dashboard_url
+        rescue Octokit::NotFound => e
+          Rails.logger.info "Not found error from octokit: #{e}"
+          redirect_to user_access_path
         end
-        grant_admin_to_god!
-        redirect_to dashboard_url
       end
     end
   end

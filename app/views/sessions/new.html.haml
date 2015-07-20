@@ -5,11 +5,7 @@
   - content_for(:footer) do
     %small
       %i.fa.fa-lock
-      != "A <a href='https://github.com/'>GitHub account</a> is required to use Packager.co"
-    %div.pull-right
-      / %a{href: '/auth/github'}
-      /   %img{height: 50, width: 50, src: 'http://octodex.github.com/images/daftpunktocat-thomas.gif', alt: 'GH Login', class: 'img-thumbnail'}
-    %div.clearfix
+      != "A <a href='https://github.com/'>GitHub account</a> is required to use #{request.host}"
 
   - content_for(:panel) do
     / = simple_form_for @session, :url => authenticate_user_url, :for => 'session' do |f|
