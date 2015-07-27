@@ -1,3 +1,6 @@
+# v0.1.34
+* [fix] Prevent name collisions on product init
+
 # v0.1.32
 * Allow GH authorization access to be user controlled
 
