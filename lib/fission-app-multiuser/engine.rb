@@ -10,9 +10,7 @@ module FissionApp
           :name => 'fission-admin',
           :source_id => src.id
         )
-        fission = Fission::Data::Models::Product.find_or_create(
-          :name => 'Fission'
-        )
+        fission = FissionApp.init_product(:fission)
         feature = Fission::Data::Models::ProductFeature.find_or_create(
           :name => 'Site Administration',
           :product_id => fission.id
@@ -28,7 +26,7 @@ module FissionApp
           admin_account.add_product_feature(feature)
         end
 
-        product = Fission::Data::Models::Product.find_or_create(:name => 'Tokens')
+        product = FissionApp.init_product(:tokens)
         feature = Fission::Data::Models::ProductFeature.find_or_create(
           :name => 'Account token generation',
           :product_id => product.id
