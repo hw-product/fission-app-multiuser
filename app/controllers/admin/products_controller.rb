@@ -166,7 +166,7 @@ class Admin::ProductsController < ApplicationController
               FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
             end
           end
-          product.remove_enabled_products
+          product.remove_all_enabled_products
           if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
             Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
               product.add_enabled_product(e_product)
