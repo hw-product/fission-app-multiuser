@@ -5,7 +5,7 @@
   = f.text_field :vanity_dns, :value => @product ? @product.vanity_dns : nil
   = f.text_field :glob_dns, :value => @product ? @product.glob_dns : nil
   = f.select :service_group_id, @service_groups.map{|g| [g.name, g.id]}.unshift(['','']), :selected => @product && @product.service_group ? @product.service_group.id : ''
-  = f.select :enabled_product_ids, @products.map{|p| [p.name, p.id]}.unshift(['','']), :selected => @product ? @product.enabled_products.map(&:id) : [], :multiple => true
+  = f.select :enabled_product_ids, @products.map{|p| [p.name, p.id]}.unshift(['','']), {:selected => @product ? @product.enabled_products.map(&:id) : [], :include_hidden => false}, :multiple => true
   %br
   %fieldset
     %legend
