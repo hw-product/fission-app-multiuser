@@ -54,7 +54,7 @@ class SessionsController < ApplicationController
             user_act = user.accounts.detect do |act|
               act.name == user.username
             end
-            current_user.session[:current_account_id] = user_act.id if user_act.id
+            user.session[:current_account_id] = user_act.try(:id)
             session[:validator] = user_checksum(user)
           else
             Rails.logger.error "Failed to create user!"
