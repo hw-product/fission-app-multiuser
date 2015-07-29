@@ -1,3 +1,7 @@
+# v0.1.36
+* Fix initial account setting on login
+* Add admin support for product nesting in isolation mode
+
 # v0.1.34
 * [fix] Prevent name collisions on product init
 
