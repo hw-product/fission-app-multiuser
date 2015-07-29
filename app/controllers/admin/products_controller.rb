@@ -23,6 +23,7 @@ class Admin::ProductsController < ApplicationController
         @style_keys = style_keys
         @service_groups = ServiceGroup.order(:name).all
         @permissions = Permission.order(:name).all
+        @products = Product.order(:name).all
       end
     end
   end
@@ -63,6 +64,11 @@ class Admin::ProductsController < ApplicationController
           style.save
           FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
         end
+        if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
+          Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
+            product.add_enabled_product(e_product)
+          end
+        end
         flash[:success] = "New product created! (#{product.name})"
         redirect_to admin_products_path
       end
@@ -81,6 +87,7 @@ class Admin::ProductsController < ApplicationController
           @style_keys = style_keys
           @service_groups = ServiceGroup.order(:name).all
           @permissions = Permission.order(:name).all
+          @products = Product.order(:name).all - [@product]
         else
           flash[:error] = 'Failed to locate requested product!'
           redirect_to admin_products_path
@@ -157,6 +164,12 @@ class Admin::ProductsController < ApplicationController
             ProductStyle.where(:product_id => product.id).destroy
             if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
               FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
+            end
+          end
+          product.remove_enabled_products
+          if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
+            Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
+              product.add_enabled_product(e_product)
             end
           end
           flash[:success] = "Product updated! (#{product.name})"
