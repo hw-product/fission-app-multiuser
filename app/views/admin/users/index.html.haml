@@ -1,0 +1,13 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'user_list',
+      :locals => {
+        :users => @users,
+        :title => 'All users',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-users', :container_class => 'admin' })

@@ -1,0 +1,40 @@
+- content_for(:panel) do
+  = bootstrap_form_tag :url => '#' do |f|
+    = f.text_field :username, :value => user.username, :disabled => true
+    = f.text_field :name, :value => user.name, :disabled => true
+    = f.text_field :email, :value => user.default_identity.try(:infos).try(:[], :email), :disabled => true
+    = f.text_field :source, :value => user.source.name, :disabled => true
+    = f.text_field :created, :value => user.created_at, :disabled => true
+    %fieldset
+      %legend
+        Owned accounts
+      %table.table.table-hover.table-bordered
+        - user.owned_accounts_dataset.order(:name).each do |act|
+          %tr.linked{:href => admin_account_path(act)}
+            %td= act.name
+    %fieldset
+      %legend
+        Managed accounts
+      %table.table.table-hover.table-bordered
+        - user.managed_accounts_dataset.order(:name).each do |act|
+          %tr.linked{:href => admin_account_path(act)}
+            %td= act.name
+    %fieldset
+      %legend
+        Member accounts
+      %table.table.table-hover.table-bordered
+        - user.member_accounts_dataset.order(:name).each do |act|
+          %tr.linked{:href => admin_account_path(act)}
+            %td= act.name
+
+:ruby
+  output = render(
+    :partial => 'layouts/container',
+    :locals => {
+      :panel => {
+        :heading => "User details: #{user.username}"
+      }
+    }
+  )
+
+= output
