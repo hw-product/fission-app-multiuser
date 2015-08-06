@@ -1,0 +1,6 @@
+:ruby
+  content_for(:container) do
+    render :partial => 'admin/users/details', :locals => {:user => @user}
+  end
+
+= render 'layouts/container'

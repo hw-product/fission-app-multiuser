@@ -1,0 +1,27 @@
+- unless content_for?(:assume_button)
+  - content_for(:assume_button) do
+    %span.glyphicon.glyphicon-flash
+
+- content_for(:pagination_) do
+  - if content_for?(pagination)
+    %div.fission-pagination.well.well-sm= content_for(pagination)
+
+- content_for(:panel) do
+  = content_for(:pagination_)
+
+  - header_data = ['Username', 'Source', 'Created', 'Accounts']
+  - header_classes = ['col-md-5', 'col-md-4', 'col-md-2', 'col-md-1']
+  - content_for(:table_body) do
+    - users.each do |user|
+      %tr.linked{ href: admin_user_path(user) }
+        %td= user.username
+        %td= user.source.name
+        %td= user.created_at.strftime('%Y/%m/%d')
+        %td= user.managed_accounts_dataset.count + user.owned_accounts_dataset.count
+
+  = render(:partial => 'layouts/table', :locals => { :header_data => header_data, :header_classes => header_classes  })
+
+  = content_for(:pagination_)
+
+- heading = defined?(title) ? title : nil
+= render(:partial => 'layouts/panel', :locals => { :heading => heading })

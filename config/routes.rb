@@ -5,13 +5,12 @@ Rails.application.routes.draw do
       member do
         get :assume
       end
-      # resources :users
       # resources :permissions
       # resources :tokens
     end
-    # resources :users do
-    #   resources :tokens
-    # end
+    resources :users do
+      # resources :tokens
+    end
     resources :sources do
       resources :accounts
     end
