@@ -1,3 +1,6 @@
+# v0.1.38
+* Add user list for admins
+
 # v0.1.36
 * Fix initial account setting on login
 * Add admin support for product nesting in isolation mode
