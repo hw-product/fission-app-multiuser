@@ -76,6 +76,7 @@ module FissionApp
           Smash.new(
             'Admin' => Smash.new(
               'Accounts' => Rails.application.routes.url_helpers.admin_accounts_path,
+              'Users' => Rails.application.routes.url_helpers.admin_users_path,
               'Sources' => Rails.application.routes.url_helpers.admin_sources_path,
               'Products' => Rails.application.routes.url_helpers.admin_products_path,
               'Permissions' => Rails.application.routes.url_helpers.admin_permissions_path,
