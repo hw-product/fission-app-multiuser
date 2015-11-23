@@ -36,7 +36,8 @@ class Admin::PlansController < ApplicationController
           :name => params[:name],
           :summary => params[:summary],
           :description => params[:description],
-          :product_id => params[:product_id].present? ? params[:product_id].to_i : nil
+          :product_id => params[:product_id].present? ? params[:product_id].to_i : nil,
+          :trial_days => params[:trial_days].present? ? params[:trial_days].to_i : 15
         )
         plan.price = params[:price].to_i
         if(params[:product_features].present?)
@@ -81,8 +82,8 @@ class Admin::PlansController < ApplicationController
           plan.summary = params[:summary]
           plan.description = params[:description]
           plan.product_id = params[:product_id].present? ? params[:product_id].to_i : nil
-          plan.save
           plan.price = params[:price].to_i
+          plan.save
           plan.remove_all_product_features
           if(params[:product_features].present?)
             ProductFeature.where(:id => params[:product_features].map(&:to_i)).all.each do |f|

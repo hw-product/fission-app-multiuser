@@ -4,6 +4,9 @@
   = f.text_field :price, :value => @plan ? @plan.cost : nil, :prepend => '$', :append => '.00'
   = f.select :product_id, @products.map{|g| [g.name, g.id]}, :label => 'Products', :include_blank => true, :selected => @plan && @plan.product ? @plan.product.id : nil
   = f.text_area :description, :value => @plan ? @plan.description : nil
+  - if engine?(:stripe)
+    = f.text_field :trial_days, :value => @plan ? @plan.trial_days : nil
+
   .panel.panel-default
     .panel-heading
       Enabled product features
