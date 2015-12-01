@@ -16,6 +16,10 @@
       %i.fa.fa-github-square
       = "sign in with GitHub"
 
-  = render(:partial => 'layouts/panel', :locals => { :id => 'login', :heading => content_for(:heading), :footer => content_for(:footer) })
+  .row
+    .col-xs-2.col-md-4
+    .col-xs-8.col-md-4
+      = render(:partial => 'layouts/panel', :locals => { :id => 'login', :heading => content_for(:heading), :footer => content_for(:footer) })
+    .col-xs-2.col-md-4
 
 = render(:partial => 'layouts/container')
