@@ -104,18 +104,18 @@ class SessionsController < ApplicationController
       team.name == 'Owners' ? :owner : :member
     end
     all_orgs = []
-    github_accounts[:owner].map! do |team|
+    gh_owner = github_accounts.fetch(:owner, []).map do |team|
       org = team.organization
       all_orgs.push(org)
       org.login
-    end.uniq!
-    github_accounts[:member].map! do |team|
+    end.uniq
+    gh_member = github_accounts.fetch(:member, []).map do |team|
       org = team.organization
       all_orgs.push(org)
       org.login
-    end.uniq!
-    github_accounts[:member] -= github_accounts[:owner]
-    github_accounts[:owner].each do |org_name|
+    end.uniq
+    gh_member -= gh_owner
+    gh_owner.each do |org_name|
       next if accts.include?(org_name)
       account = source.accounts_dataset.where(:name => org_name).first
       if(account)
@@ -126,7 +126,7 @@ class SessionsController < ApplicationController
         )
       end
     end
-    github_accounts[:member].each do |org_name|
+    gh_member.each do |org_name|
       next if accts.include?(org_name)
       account = source.accounts_dataset.where(:name => org_name).first
       if(account)
