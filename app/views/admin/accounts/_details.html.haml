@@ -18,7 +18,7 @@
     = f.text_field :managers, :value => account.owners_dataset.count, :disabled => true
     = f.text_field :members, :value => account.members_dataset.count, :disabled => true
     = f.submit 'Save', :class => 'btn btn-success pull-right', :id => 'feature-form-submit'
-
+    .clearfix
 :ruby
   output = render(
     :partial => 'layouts/container',
