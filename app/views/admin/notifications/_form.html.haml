@@ -1,0 +1,7 @@
+= bootstrap_form_tag form_opts.merge(:html => {:id => 'notification-form'}) do |f|
+  = f.text_field :subject, :value => @notification.subject, :autofocus => true
+  = f.text_area :message, :value => @notification.message
+  = f.text_field :open_date, :value => @notification.open_date, :class => 'timepicker'
+  = f.text_field :close_date, :value => @notification.close_date, :class => 'timepicker'
+  = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
+  .clearfix

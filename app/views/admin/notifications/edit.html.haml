@@ -1,0 +1,22 @@
+:ruby
+  id = 'edit-notification'
+  content_for(:container) do
+    render(
+      :partial => 'layouts/panel',
+      :locals => {
+        :id => id,
+        :heading => 'Edit Notification',
+        :panel_content => render(
+          :partial => 'form',
+          :locals => {
+            :form_opts => {
+              :url => admin_notification_path(@notification),
+              :method => :put
+            }
+          }
+        )
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => {:container_class => "#{id}-form", :container_id => id})

@@ -1,0 +1,35 @@
+- content_for(:heading_title) do
+  %b
+    Notifications Listing
+  = link_to('Create', new_admin_notification_path, :class => 'btn btn-success btn-sm pull-right')
+  .clearfix
+
+- content_for(:table_body) do
+  - notifications.map do |notification|
+    :ruby
+      if(notification.closed?)
+        bg = 'bg-danger'
+      elsif(!notification.open?)
+        bg = 'bg-warning'
+      end
+    %tr.linked{:class => bg, :href => edit_admin_notification_path(notification)}
+      - [:subject, :created_at, :open_date, :close_date].each do |key|
+        %td= notification.send(key)
+
+:ruby
+  id = 'notification-list'
+  content = render(
+    :partial => 'layouts/panel',
+    :locals => {
+      :id => id,
+      :heading => yield(:heading_title),
+      :panel_content => render(
+        :partial => 'layouts/table',
+        :locals => {
+          :header_data => ['Subject', 'Created', 'Open', 'Close']
+        }
+      )
+    }
+  )
+
+= content

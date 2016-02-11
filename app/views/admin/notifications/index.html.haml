@@ -1,0 +1,13 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'notification_list',
+      :locals => {
+        :notifications => @notifications,
+        :title => 'All Notifications',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-notifications', :container_class => 'admin' })
