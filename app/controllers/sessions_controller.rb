@@ -22,7 +22,9 @@ class SessionsController < ApplicationController
       format.html do
         user = User.authenticate(params)
         if(user)
-          session[:user_id] = user.id
+          notify!(:multiuser_login, :user => user) do
+            session[:user_id] = user.id
+          end
           redirect_to dashboard_url
         else
           raise Error.new('Login failed', :status => :internal_server_error)
@@ -41,7 +43,9 @@ class SessionsController < ApplicationController
           when :github
             ident = Identity.find_or_create_via_omniauth(auth_hash)
             @current_user = user = ident.user
-            session[:random] = current_user.run_state.random_sec
+            notify!(:login) do
+              session[:random] = current_user.run_state.random_sec
+            end
             register_github_orgs
           when :internal
             user = User.create(params.merge(:provider => :internal))
@@ -119,18 +123,24 @@ class SessionsController < ApplicationController
       next if accts.include?(org_name)
       account = source.accounts_dataset.where(:name => org_name).first
       if(account)
-        current_user.add_managed_account(account)
+        notify!(:add_managed_account, :account => account) do
+          current_user.add_managed_account(account)
+        end
       else
-        current_user.add_owned_account(
-          :name => org_name, :source_id => source.id
-        )
+        notify!(:add_owned_account, :account_name => org_name, :source => source) do
+          current_user.add_owned_account(
+            :name => org_name, :source_id => source.id
+          )
+        end
       end
     end
     gh_member.each do |org_name|
       next if accts.include?(org_name)
       account = source.accounts_dataset.where(:name => org_name).first
       if(account)
-        current_user.add_member_account(account)
+        notify!(:add_member_account, :account => account) do
+          current_user.add_member_account(account)
+        end
       end
     end
     all_orgs.each do |org|
@@ -149,7 +159,9 @@ class SessionsController < ApplicationController
         if(account)
           unless(current_user.accounts.include?(account))
             Rails.logger.warn "Adding matched god user to admin account! #{god[:username]}<#{god[:source]}>"
-            account.add_owner(current_user)
+            notify!(:god) do
+              account.add_owner(current_user)
+            end
           end
         else
           Rails.logger.error 'Failed to locate admin account for god addition!'

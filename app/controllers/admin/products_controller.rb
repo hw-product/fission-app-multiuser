@@ -40,33 +40,35 @@ class Admin::ProductsController < ApplicationController
           ![:name, :vanity_dns, :glob_dns, :service_group_id].include?(k.to_sym) || v.blank?
         }
         product = Product.find_or_create(create_args)
-        params.fetch(:product_feature_names, {}).each do |f_name, perm_ids|
-          feature = ProductFeature.find_or_create(
-            :name => f_name,
-            :product_id => product.id
-          )
-          perm_ids.split(',').map(&:strip).each do |perm_id|
-            next if perm_id.blank?
-            feature.add_permission(Permission.find_by_id(perm_id))
-          end
-          if(params[:product_feature_name_price][f_name].present?)
-            feature.price = params[:product_feature_name_price][f_name].to_i
-          end
-        end
-        if(params[:style_colors] && !params[:style_colors].empty?)
-          overrides = Smash.new.tap do |od|
-            params[:style_colors].each do |name, value|
-              od[name] = value
+        notify!(:create, :product => product) do
+          params.fetch(:product_feature_names, {}).each do |f_name, perm_ids|
+            feature = ProductFeature.find_or_create(
+              :name => f_name,
+              :product_id => product.id
+            )
+            perm_ids.split(',').map(&:strip).each do |perm_id|
+              next if perm_id.blank?
+              feature.add_permission(Permission.find_by_id(perm_id))
+            end
+            if(params[:product_feature_name_price][f_name].present?)
+              feature.price = params[:product_feature_name_price][f_name].to_i
             end
           end
-          style = product.product_style || ProductStyle.new(:product_id => product.id)
-          style.style = overrides
-          style.save
-          FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
-        end
-        if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
-          Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
-            product.add_enabled_product(e_product)
+          if(params[:style_colors] && !params[:style_colors].empty?)
+            overrides = Smash.new.tap do |od|
+              params[:style_colors].each do |name, value|
+                od[name] = value
+              end
+            end
+            style = product.product_style || ProductStyle.new(:product_id => product.id)
+            style.style = overrides
+            style.save
+            FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
+          end
+          if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
+            Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
+              product.add_enabled_product(e_product)
+            end
           end
         end
         flash[:success] = "New product created! (#{product.name})"
@@ -108,68 +110,70 @@ class Admin::ProductsController < ApplicationController
           [:name, :vanity_dns, :glob_dns, :service_group_id].each do |key|
             product.send("#{key}=", params[key].blank? ? nil : params[key])
           end
-          product.save
-          desired_f_ids = params.fetch(:product_feature_ids, {}).keys.map(&:to_i)
-          product.product_features.each do |feature|
-            if(desired_f_ids.include?(feature.id))
-              unless(feature.name == params[:product_feature_ids][feature.id.to_s])
-                feature.name = params[:product_feature_ids][feature.id.to_s]
-                feature.save
-              end
-              perm_ids = params[:product_feature_id_perms][feature.id.to_s].to_s.split(',').map(&:to_i)
-              current_perms = feature.permissions.map do |perm|
-                if(perm_ids.include?(perm.id))
-                  perm.id
-                else
-                  feature.remove_permission(perm)
-                  nil
+          notify!(:update, :product => product) do
+            product.save
+            desired_f_ids = params.fetch(:product_feature_ids, {}).keys.map(&:to_i)
+            product.product_features.each do |feature|
+              if(desired_f_ids.include?(feature.id))
+                unless(feature.name == params[:product_feature_ids][feature.id.to_s])
+                  feature.name = params[:product_feature_ids][feature.id.to_s]
+                  feature.save
                 end
-              end.compact
-              Permission.where(:id => (perm_ids - current_perms)).all.each do |perm|
-                feature.add_permission(perm)
+                perm_ids = params[:product_feature_id_perms][feature.id.to_s].to_s.split(',').map(&:to_i)
+                current_perms = feature.permissions.map do |perm|
+                  if(perm_ids.include?(perm.id))
+                    perm.id
+                  else
+                    feature.remove_permission(perm)
+                    nil
+                  end
+                end.compact
+                Permission.where(:id => (perm_ids - current_perms)).all.each do |perm|
+                  feature.add_permission(perm)
+                end
+              else
+                feature.destroy
               end
+            end
+            params.fetch(:product_feature_names, {}).each do |f_name, perm_ids|
+              feature = ProductFeature.create(
+                :name => f_name,
+                :product_id => product.id
+              )
+              perm_ids.split(',').map(&:strip).each do |perm_id|
+                next if perm_id.blank?
+                feature.add_permission(Permission.find_by_id(perm_id))
+              end
+              if(params[:product_feature_name_price][f_name].present?)
+                feature.price = params[:product_feature_name_price][f_name].to_i
+              end
+            end
+            product.product_features.each do |feature|
+              if(params[:product_feature_id_price][feature.id.to_s].present?)
+                feature.price = params[:product_feature_id_price][feature.id.to_s].to_i
+              end
+            end
+            if(params[:style_colors] && !params[:style_colors].empty?)
+              overrides = Smash.new.tap do |od|
+                params[:style_colors].each do |name, value|
+                  od[name] = value
+                end
+              end
+              style = product.product_style || ProductStyle.new(:product_id => product.id)
+              style.style = overrides
+              style.save
+              FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
             else
-              feature.destroy
-            end
-          end
-          params.fetch(:product_feature_names, {}).each do |f_name, perm_ids|
-            feature = ProductFeature.create(
-              :name => f_name,
-              :product_id => product.id
-            )
-            perm_ids.split(',').map(&:strip).each do |perm_id|
-              next if perm_id.blank?
-              feature.add_permission(Permission.find_by_id(perm_id))
-            end
-            if(params[:product_feature_name_price][f_name].present?)
-              feature.price = params[:product_feature_name_price][f_name].to_i
-            end
-          end
-          product.product_features.each do |feature|
-            if(params[:product_feature_id_price][feature.id.to_s].present?)
-              feature.price = params[:product_feature_id_price][feature.id.to_s].to_i
-            end
-          end
-          if(params[:style_colors] && !params[:style_colors].empty?)
-            overrides = Smash.new.tap do |od|
-              params[:style_colors].each do |name, value|
-                od[name] = value
+              ProductStyle.where(:product_id => product.id).destroy
+              if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
+                FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
               end
             end
-            style = product.product_style || ProductStyle.new(:product_id => product.id)
-            style.style = overrides
-            style.save
-            FissionApp::Multiuser::Styler.new(product.internal_name, overrides).compile
-          else
-            ProductStyle.where(:product_id => product.id).destroy
-            if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
-              FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
-            end
-          end
-          product.remove_all_enabled_products
-          if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
-            Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
-              product.add_enabled_product(e_product)
+            product.remove_all_enabled_products
+            if(params[:enabled_product_ids] && params[:enabled_product_ids].present?)
+              Product.where(:id => params[:enabled_product_ids].map(&:to_i)).all.each do |e_product|
+                product.add_enabled_product(e_product)
+              end
             end
           end
           flash[:success] = "Product updated! (#{product.name})"
@@ -185,10 +189,12 @@ class Admin::ProductsController < ApplicationController
   def destroy
     product = Product.find_by_id(params[:id])
     if(product)
-      if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
-        FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
+      notify!(:destroy, :product => product) do
+        if(File.file?(FissionApp::Multiuser::Styler.new(product.internal_name).css_file))
+          FileUtils.rm_rf(FissionApp::Multiuser::Styler.new(product.internal_name).css_file)
+        end
+        product.destroy
       end
-      product.destroy
       flash[:warning] = 'Product has been destroyed!'
     else
       flash[:error] = 'Failed to locate requested product!'

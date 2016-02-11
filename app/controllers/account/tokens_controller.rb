@@ -32,14 +32,16 @@ class Account::TokensController < ApplicationController
       end
       format.html do
         begin
-          token = Token.create(
+          token = Token.new(
             :name => params[:name],
             :description => params[:description],
             :account_id => @account.id
           )
+          notify!(:create, :token => token) do
+            token.save
+          end
           flash[:success] = 'New token successfully created!'
         rescue => e
-          puts "#{e.class}: #{e}\n#{e.backtrace.join("\n")}"
           flash[:error] = "Failed to create new token: #{e}"
         end
         redirect_to account_tokens_path
@@ -75,8 +77,10 @@ class Account::TokensController < ApplicationController
           begin
             token.name = params[:name] unless params[:name].blank?
             token.description = params[:description] unless params[:description].blank?
-            token.save
-          flash[:success] = 'Token successfully updated!'
+            notify!(:update, :token => token) do
+              token.save
+            end
+            flash[:success] = 'Token successfully updated!'
           rescue => e
             flash[:error] = "Failed to update token: #{e}"
           end
@@ -92,7 +96,9 @@ class Account::TokensController < ApplicationController
   def destroy
     token = @account.tokens_dataset.where(:id => params[:id]).first
     if(token)
-      token.destroy
+      notify!(:destroy) do
+        token.destroy
+      end
       flash[:success] = 'Successfully destroyed token!'
     else
       flash[:error] = 'Failed to locate requested token!'
