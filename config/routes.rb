@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     resources :products, :except => [:show]
     resources :permissions
     resources :plans
-
+    resources :notifications
   end
 
   namespace :account do

@@ -80,7 +80,8 @@ module FissionApp
               'Sources' => Rails.application.routes.url_helpers.admin_sources_path,
               'Products' => Rails.application.routes.url_helpers.admin_products_path,
               'Permissions' => Rails.application.routes.url_helpers.admin_permissions_path,
-              'Plans' => Rails.application.routes.url_helpers.admin_plans_path
+              'Plans' => Rails.application.routes.url_helpers.admin_plans_path,
+              'Notifications' => Rails.application.routes.url_helpers.admin_notifications_path
             )
           )
         else
