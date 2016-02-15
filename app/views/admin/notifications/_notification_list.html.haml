@@ -12,9 +12,11 @@
       elsif(!notification.open?)
         bg = 'bg-warning'
       end
-    %tr.linked{:class => bg, :href => edit_admin_notification_path(notification)}
+    %tr.linked{:class => bg, :href => admin_notification_path(notification)}
       - [:subject, :created_at, :open_date, :close_date].each do |key|
         %td= notification.send(key)
+      %td= link_to yield(:edit_icon), edit_admin_notification_path(notification)
+
 
 :ruby
   id = 'notification-list'
@@ -26,7 +28,7 @@
       :panel_content => render(
         :partial => 'layouts/table',
         :locals => {
-          :header_data => ['Subject', 'Created', 'Open', 'Close']
+          :header_data => ['Subject', 'Created', 'Open', 'Close', '']
         }
       )
     }

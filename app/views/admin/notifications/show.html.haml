@@ -1,3 +1,11 @@
+- content_for(:notification_heading) do
+  = "Notification: #{@notification.subject}"
+  %button.window-rails.btn.btn-xs.btn-danger.pull-right{'window-rails-ajax' => :delete, 'window-rails-url' => admin_notification_path(@notification.id), 'window-rails-confirm' => "Destroy notification `#{@notification.subject}`?", 'window-rails-progress' => 'Destroying plan', 'window-rails-title' => 'Notification destruction'}
+    %span.glyphicon.glyphicon-trash
+  = link_to yield(:edit_icon), edit_admin_notification_path(@notification), :class => 'pull-right'
+  .clearfix
+
+
 :ruby
   id = 'display-notification'
   content_for(:container) do
@@ -5,7 +13,7 @@
       :partial => 'layouts/panel',
       :locals => {
         :id => id,
-        :heading => 'Edit Notification',
+        :heading => yield(:notification_heading),
         :panel_content => render(
           :partial => 'display',
           :locals => {

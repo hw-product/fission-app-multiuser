@@ -1,0 +1,26 @@
+.notification-content.well.well= notification.message.md_to_html
+.row
+  .col-md-4
+    .panel.panel-default
+      .panel-heading
+        Accounts
+      .list-group
+        %ul.list-group
+          - notification.accounts_dataset.order(:name.asc).each do |act|
+            %li.list-group-item= act.name
+  .col-md-4
+    .panel.panel-default
+      .panel-heading
+        Users
+      .list-group
+        %ul.list-group
+          - notification.users_dataset.order(:username.asc).each do |user|
+            %li.list-group-item= user.username
+  .col-md-4
+    .panel.panel-default
+      .panel-heading
+        Seen By
+      .list-group
+        %ul.list-group
+          - notification.seen_users_dataset.order(:username.asc).each do |user|
+            %li.list-group-item= user.username

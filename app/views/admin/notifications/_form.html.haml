@@ -3,5 +3,7 @@
   = f.text_area :message, :value => @notification.message
   = f.text_field :open_date, :value => @notification.open_date, :class => 'timepicker'
   = f.text_field :close_date, :value => @notification.close_date, :class => 'timepicker'
+  = f.select :accounts, options_for_select(Fission::Data::Models::Account.order(:name.asc).all.map{|a| [a.name, a.id]}, @notification.accounts.map(&:id)), {}, :multiple => true
+  = f.select :users, options_for_select(Fission::Data::Models::User.order(:username.asc).all.map{|a| [a.username, a.id]}, @notification.users.map(&:id)), {}, :multiple => true
   = f.submit 'Save', :disable_with => 'Saving...', :class => 'btn btn-success pull-right'
   .clearfix
