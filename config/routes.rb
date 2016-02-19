@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   end
 
   # resources :users
+  resources :notifications, :only => [:index, :show]
 
   get 'user/access', :to => 'users#access', :as => :user_access
 

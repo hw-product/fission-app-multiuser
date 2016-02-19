@@ -1,0 +1,8 @@
+<%=
+  create_window(
+    :name => 'notification_display',
+    :title => @notification.subject,
+    :size => 'normal',
+    :content => @notification.message.md_to_html.html_safe
+  )
+%>

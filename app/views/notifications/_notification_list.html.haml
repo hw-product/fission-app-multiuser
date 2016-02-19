@@ -1,0 +1,30 @@
+- content_for(:table_body) do
+  - notifications.map do |notification|
+    :ruby
+      if(notification.closed?)
+        bg = 'bg-danger'
+      elsif(!notification.open?)
+        bg = 'bg-warning'
+      end
+    %tr.notification-item{:class => bg, :href => notification_path(notification)}
+      - [:subject, :created_at].each do |key|
+        %td= notification.send(key)
+      %td= yield(:delete_icon)
+
+:ruby
+  id = 'notification-list'
+  content = render(
+    :partial => 'layouts/panel',
+    :locals => {
+      :id => id,
+      :heading => "Message Center",
+      :panel_content => render(
+        :partial => 'layouts/table',
+        :locals => {
+          :header_data => ['Subject', 'Created', '']
+        }
+      )
+    }
+  )
+
+= content

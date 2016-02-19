@@ -100,7 +100,10 @@ module FissionApp
 
       # @return [Hash] user navigation
       def fission_user_navigation(product, user)
-        Smash.new('Access' => Rails.application.routes.url_helpers.user_access_path)
+        Smash.new(
+          'Access' => Rails.application.routes.url_helpers.user_access_path,
+          'Notifications' => Rails.application.routes.url_helpers.notifications_path
+        )
       end
 
       # @return [Array<Fission::Models::Permission>] default permissions

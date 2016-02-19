@@ -1,0 +1,21 @@
+:ruby
+  content_for(:container) do
+    render(
+      :partial => 'notification_list',
+      :locals => {
+        :notifications => @notifications,
+        :title => 'All Notifications',
+        :pagination => :pagination
+      }
+    )
+  end
+
+= render(:partial => 'layouts/container', :locals => { :container_id => 'fission-notifications' })
+
+:javascript
+  $(document).ready(function(){
+    $('tr.notification-item').click(function(event){
+      $.get($(this).attr('href'));
+      return false;
+    });
+  });
