@@ -11,7 +11,8 @@ FissionApp.subscribe(/^(before|after)_render/) do |*args|
         :title => 'Notifications',
         :content => "New notifications <a href=\"/notifications\">(#{n_count})</a>",
         :location => 'bottom',
-        :duration => 10
+        :duration => 10,
+        :id => "new-notifications-#{event.payload[:account].open_notifications.order(:created_at).first.id}"
       )
       if(type.include?('javascript'))
         event.payload[:body].first << item
