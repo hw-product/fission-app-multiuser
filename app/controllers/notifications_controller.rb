@@ -3,7 +3,7 @@ class NotificationsController < ApplicationController
   before_action :validate_access!, :except => [:index, :show], :if => lambda{ user_mode? && valid_user? }
 
   def index
-    @notifications = current_user.run_state[:current_account].open_notifications.order(:created_at.desc).paginate(page, per_page)
+    @notifications = current_user.all_open_notifications.order(:created_at.desc).paginate(page, per_page)
     respond_to do |format|
       format.js
       format.html
@@ -11,7 +11,7 @@ class NotificationsController < ApplicationController
   end
 
   def show
-    @notification = current_user.run_state[:current_account].open_notifications.where(:id => params[:id]).first
+    @notification = current_user.all_open_notifications.where(:id => params[:id]).first
     respond_to do |format|
       format.js
       format.html do
