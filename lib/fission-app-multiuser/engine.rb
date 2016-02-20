@@ -114,7 +114,10 @@ module FissionApp
 
       # @return [Array<Fission::Models::Permission>] default permissions
       def default_user_permissions(*_)
-        Fission::Data::Models::Permission.new(:pattern => '/users?/.+')
+        [
+          Fission::Data::Models::Permission.new(:pattern => '/users?/.+'),
+          Fission::Data::Models::Permission.new(:pattern => '/notifications.*')
+        ]
       end
 
     end
