@@ -3,6 +3,10 @@ module FissionApp
     class Engine < ::Rails::Engine
 
       config.to_prepare do |config|
+
+        # install subscriptions
+        require 'fission-app-multiuser/subscriptions/notifications'
+
         require 'fission-app-multiuser/styler'
         # NOTE: This is the default admin account
         src = Fission::Data::Models::Source.find_or_create(:name => 'internal')
@@ -48,6 +52,7 @@ module FissionApp
             end
           end
         end
+
       end
 
       config.after_initialize do
