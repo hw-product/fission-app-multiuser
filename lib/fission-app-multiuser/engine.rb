@@ -6,6 +6,7 @@ module FissionApp
 
         # install subscriptions
         require 'fission-app-multiuser/subscriptions/notifications'
+        require 'fission-app-multiuser/subscriptions/new_notifications'
 
         require 'fission-app-multiuser/styler'
         # NOTE: This is the default admin account
