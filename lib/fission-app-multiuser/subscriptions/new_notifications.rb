@@ -4,7 +4,7 @@ require 'fission-app'
 FissionApp.subscribe(/^(before|after)_render/) do |*args|
   event = ActiveSupport::Notifications::Event.new(*args)
   type = event.payload[:response].content_type
-  if(type.include?('javascript') || type.include?('html'))
+  if((type.include?('javascript') && event.payload[:body]) || type.include?('html'))
     if((n_count = event.payload[:account].open_notifications.count) > 0)
       item = FissionApp.auto_popup_formatter(
         :dom_id => 'user-menu',
@@ -14,7 +14,7 @@ FissionApp.subscribe(/^(before|after)_render/) do |*args|
         :duration => 10
       )
       if(type.include?('javascript'))
-        event.body.first << item
+        event.payload[:body].first << item
       else
         event.payload[:user].run_state.script_inject << item
       end
