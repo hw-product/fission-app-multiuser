@@ -120,6 +120,18 @@ module FissionApp
         ]
       end
 
+      # @return [Smash]
+      def fission_dashboard(product, current_user)
+        notifications = current_user.all_open_notifications.order(:created_at.desc).limit(5)
+        Smash.new(
+          :notifications => {
+            :cell => :notifications_dashboard,
+            :title => 'Recent Notifications',
+            :url => Rails.application.routes.url_helpers.notifications_path
+          }
+        )
+      end
+
     end
   end
 end
