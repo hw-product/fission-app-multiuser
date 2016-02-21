@@ -11,7 +11,7 @@ class NotificationsController < ApplicationController
   end
 
   def show
-    @notification = current_user.all_open_notifications.where(:id => params[:id]).first
+    @notification = current_user.all_open_notifications.where(:notifications__id => params[:id]).first
     respond_to do |format|
       format.js
       format.html do
