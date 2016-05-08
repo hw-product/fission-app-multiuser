@@ -54,6 +54,18 @@ class Admin::NotificationsController < ApplicationController
           @notification.close_date = Time.parse(params[:close_date]).to_datetime
         end
         @notification.save
+        valid_acts = params.fetch(:accounts, []).find_all(&:present?).map(&:to_i) - @notification.accounts.map(&:id)
+        valid_users = params.fetch(:users, []).find_all(&:present?).map(&:to_i) - @notification.users.map(&:id)
+        unless(valid_acts.empty?)
+          Account.where(:id => valid_acts).all.each do |act|
+            @notification.add_account(act)
+          end
+        end
+        unless(valid_users.empty?)
+          User.where(:id => valid_users).all.each do |user|
+            @notification.add_user(user)
+          end
+        end
         if(params[:app_event_matchers].present?)
           matcher = AppEventMatcher.find_or_create(:pattern => params[:app_event_matchers])
           @notification.add_app_event_matcher matcher
