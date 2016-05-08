@@ -111,9 +111,9 @@ class SessionsController < ApplicationController
       idx += 1
     end
     github_accounts = user_teams.group_by do |team|
-      [team.name,
-        Rails.application.config.fission.config.to_smash.get(:github, :custom_owner_team)
-      ].include?(team.name) ? :owner : :member
+      [
+        Rails.application.config.fission.config.to_smash.fetch(:github, :owner_team_names, ['Owners'])
+      ].flatten.compact.include?(team.name) ? :owner : :member
     end
     all_orgs = []
     gh_owner = github_accounts.fetch(:owner, []).map do |team|
