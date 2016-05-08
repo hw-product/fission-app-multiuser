@@ -104,8 +104,16 @@ class SessionsController < ApplicationController
   def register_github_orgs
     accts = current_user.accounts.map(&:name)
     source = Source.find_or_create(:name => 'github')
-    github_accounts = github(:user).user_teams.group_by do |team|
-      team.name == 'Owners' ? :owner : :member
+    user_teams = []
+    idx = 1
+    until((fetched_teams = github(:user).user_teams(:per_page => 100, :page => idx)).count == 0)
+      user_teams += fetched_teams
+      idx += 1
+    end
+    github_accounts = user_teams.group_by do |team|
+      [team.name,
+        Rails.application.config.fission.config.to_smash.get(:github, :custom_owner_team)
+      ].include?(team.name) ? :owner : :member
     end
     all_orgs = []
     gh_owner = github_accounts.fetch(:owner, []).map do |team|
